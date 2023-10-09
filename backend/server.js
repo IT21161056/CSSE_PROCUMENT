@@ -17,6 +17,9 @@ app.use(express.json()); //this is a buit in middleware
 const siteManagerRoute = require("./routes/siteManager.routes.js");
 app.use("/siteManager", siteManagerRoute);
 
+const productRoutes = require("./routes/product.routes.js");
+app.use("/product", productRoutes);
+
 const supplierRoute = require("./routes/supplier.route.js");
 app.use("/supplier", supplierRoute);
 
