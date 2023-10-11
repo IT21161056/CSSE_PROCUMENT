@@ -28,7 +28,7 @@ const getAcceptedOrCompletedOrdersForEachSupplier = async (req, res) => {
         populate: {
           path: "productList",
           populate: {
-            path: "product",
+            path: "Product",
           },
         },
       });
@@ -159,7 +159,7 @@ const registerSupplier = async (req, res) => {
 const getSuppliersByProduct = async (req, res) => {
   try {
     const { itemName } = req.body;
-    console.log(itemName);
+
     const suppliers = await Supplier.find({
       productList: {
         $elemMatch: { name: itemName },

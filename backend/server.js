@@ -20,8 +20,14 @@ app.use("/siteManager", siteManagerRoute);
 const productRoutes = require("./routes/product.routes.js");
 app.use("/product", productRoutes);
 
+const siteRoutes = require("./routes/site.routes.js");
+app.use("/site", siteRoutes);
+
 const supplierRoute = require("./routes/supplier.route.js");
 app.use("/supplier", supplierRoute);
+
+const orderRoute = require("./routes/order.routes.js");
+app.use("/order", orderRoute);
 
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB");

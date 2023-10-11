@@ -10,7 +10,7 @@ const OrderSchema = new Schema({
       price: { type: Number, required: true },
       product: { type: String, required: true },
       qnty: { type: Number, required: true },
-      supplier: { type: String, required: true },
+      supplier: { type: mongoose.Schema.Types.ObjectId, ref: "Supplier" },
     },
   ],
   deliveryList: [
