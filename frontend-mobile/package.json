@@ -22,6 +22,7 @@
     "react-native-dropdown-select-list": "^2.0.5",
     "react-native-modal-datetime-picker": "^17.1.0",
     "react-native-multiple-select": "^0.5.12",
+    "react-native-uuid": "^2.0.1",
     "react-native-vector-icons": "^10.0.0"
   },
   "devDependencies": {

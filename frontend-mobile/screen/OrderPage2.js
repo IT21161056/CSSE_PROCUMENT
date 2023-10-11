@@ -1,33 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, SafeAreaView, StyleSheet, TextInput, Button, Alert } from "react-native";
+import { View, Text, SafeAreaView, StyleSheet, AsyncStorage, TouchableOpacity, Alert } from "react-native";
+import uuid from 'react-native-uuid';
 import { useRoute } from '@react-navigation/native';
 
 export default function OrderPage2({ route }) {
 
-  //catch the passing data from place Order page
-  const [date, setDate] = useState(null);
+  const [date, setDate] = useState(null);  //catch the passing data from place Order page
   const { params } = useRoute();
   let item = params;
   const { order } = route.params;
-
-  const [total, setTotal] = useState(0);
-
   console.log(order)
-
-  order.forEach((order, index) => {
-    console.log(`Order ${index + 1}:`);
-    console.log('Prods:', order.prods);
-    console.log('Selected Date:', order.selectedDate);
-    console.log('Site:', order.site);
-  });
-
+  
   useEffect(() => {
     let today = new Date();
     let date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
     setDate(date);
   }, []);
-
-
 
 
   return (
@@ -55,10 +43,20 @@ export default function OrderPage2({ route }) {
               <Text style={styles.order}>{`Placed date : ${date}`}</Text>
               <Text style={styles.order}>{`Required Date: ${orderItem.selectedDate}`}</Text>
               <Text style={styles.order}>{`Site Name:  ${orderItem.site}`}</Text>
+              <Text style={styles.total}>{`Order Cost:  Rs. ${orderItem.total}.00`}</Text>
             </View>
           ))}
 
         </View>
+      </View>
+      <View style={{ gap: 25, marginTop: 20 }} >
+        <TouchableOpacity style={styles.confirm} title="Confirm" onPress={() => { }}>
+          <Text style={{ fontSize: 19, color: 'white' }} title='Confirm'>Confirm</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.draft} title="Draft" onPress={()=>{ }}>
+          <Text style={{ fontSize: 19, color: 'white' }} title='Draft'>Draft</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -94,10 +92,22 @@ const styles = StyleSheet.create({
     padding: 10,
     borderColor: '#ccc',
   },
+  draft: {
+    margin: 60,
+    gap: 15,
+    borderRadius: 20
+  },
   order: {
     marginLeft: 16,
     fontSize: 16,
     marginTop: 5,
+  },
+  total: {
+    marginTop: 5,
+    marginLeft: 16,
+    fontSize: 18,
+    marginTop: 5,
+    fontWeight: 'normal',
   },
   summary: {
     fontSize: 20,
@@ -106,5 +116,25 @@ const styles = StyleSheet.create({
   },
   txt1: {
     fontSize: 16,
+  },
+  draft: {
+    backgroundColor: 'blue',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#bfbfbf',
+    marginLeft: 70,
+    marginRight: 70,
+    padding: 10,
+    borderRadius: 10,
+  },
+  confirm: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#ffa366',
+    marginLeft: 70,
+    marginRight: 70,
+    padding: 10,
+    borderRadius: 10
   }
+
 });

@@ -11,6 +11,7 @@ export default function PlaceOrder() {
 
   const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
+  const [total, setTotal] = useState(0);
 
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
@@ -40,31 +41,33 @@ export default function PlaceOrder() {
   const [price, setPrice] = useState(0)
   const [prods, setProds] = useState([])
 
-
   const handleOrder = () => {
+
+    const calculatedTotal = calculateTotal(prods);
+
     const newOrder = {
       site: sites.find(item => item.key === site).value,
       selectedDate,
-      prods
+      prods,
+      total: calculatedTotal
     };
-
+    setTotal(calculatedTotal);
     setOrder([...order, newOrder]);
-    navigation.navigate('Place2', { order })
     setSupplier("");
     setProduct("");
     setQnty("");
+    navigation.navigate('Place2', { order })
 
   };
 
-  //add repeatedly supplier product and quantity
+  //function to add repeatedly supplier product and quantity
   const handleProducts = () => {
     if (supplier && product && qnty) {
       // Find the selected product and its price
       const selectedProduct = products.find(item => item.key === product);
-      
       // Find the selected supplier and its price
       const selectedSupplier = suppliers[product].find(item => item.key === supplier);
-      
+
       if (selectedProduct && selectedSupplier) {
         const newItem = {
           product: selectedProduct.value,
@@ -72,7 +75,6 @@ export default function PlaceOrder() {
           qnty,
           price: selectedSupplier.price  // Set the product price
         };
-  
         setProds([...prods, newItem]);
         Alert.alert('Product added successfully');
         setSupplier(null);
@@ -80,9 +82,15 @@ export default function PlaceOrder() {
       }
     }
   };
-  
 
-  // console.log(prods)
+  const calculateTotal = (prods) => {
+    let total = 0;
+    prods.forEach((product) => {
+      total += product.price * product.qnty;
+    });
+    return total;
+  };
+
   const sites = [
     { key: 's1', value: 'Colombo' },
     { key: 's2', value: 'Kandy' },
@@ -92,22 +100,22 @@ export default function PlaceOrder() {
 
 
   const products = [
-    { key: '1', value: 'metal'},
+    { key: '1', value: 'metal' },
     { key: '2', value: 'sand' },
     { key: '3', value: 'cement' },
-    { key: '4', value: 'paint'},
+    { key: '4', value: 'paint' },
     { key: '5', value: 'bricks' },
     { key: '6', value: 'iron bars' },
   ]
 
   const suppliers = {
     '1': [
-      { key: '7', value: 'kamal hardware', price: 380  },
+      { key: '7', value: 'kamal hardware', price: 380 },
       { key: '8', value: 'sachin hardware', price: 450 },
     ],
     '2': [
       { key: '9', value: 'pasindu hardware', price: 1500 },
-      { key: '10', value: 'nimal hardware', price: 500  },
+      { key: '10', value: 'nimal hardware', price: 500 },
     ],
     '3': [
       { key: '11', value: 'saman hardware', price: 420 },
@@ -115,7 +123,7 @@ export default function PlaceOrder() {
     ],
     '4': [
       { key: '13', value: 'ganidu hardware', price: 560 },
-      { key: '14', value: 'ravin hardware', price: 680},
+      { key: '14', value: 'ravin hardware', price: 680 },
     ],
     '5': [
       { key: '15', value: 'namal hardware', price: 570 },
@@ -128,10 +136,10 @@ export default function PlaceOrder() {
   }
 
   const selectedSuppliers = suppliers[product] || [];
-const suppliersData = selectedSuppliers.map(item => ({
-  key: item.key,
-  value: `${item.value} - Rs. ${item.price}`
-}));
+  const suppliersData = selectedSuppliers.map(item => ({
+    key: item.key,
+    value: `${item.value} - Rs. ${item.price}`
+  }));
 
   return (
     <SafeAreaView>
