@@ -18,28 +18,28 @@ const {
   getOrderProductListByOrderId,
 } = require("../controllers/order.controller");
 
-router.get("/:id", getOrderDetails);
-router.get("/", getOrderList);
-router.post("/sitemanager/site/:siteid", addOrderBySiteManager);
-router.post("/sitemanager/confirmorder/:orderid", comfirmOrderBySiteManager);
-router.post("/manager/approve/:orderid", approvedOrDisapprovedOrderByManager);
-router.post(
-  "/procurementofficer/placedorder/:orderid",
-  placedOrderByProcurementOfficer
-);
-router.post("/supplier/accept/:orderid", acceptOrderBySuppiler);
-router.post("/supplier/unaccept/:orderid", unacceptOrderBySuppiler);
-router.post(
-  "/supplier/pricechange/:orderid/:orderproductid",
-  updateProductPriceInOrderBySupplier
-);
-router.post(
-  "/sitemanager/closed/:orderid",
-  closeOrderAfterDeliveryCompletedBySiteManager
-);
-router.get("/sitemanager/site/:siteid", getOrderListBySiteId);
-router.get("/draft/sitemanager/site/:siteid", getDraftOrderListBySiteId);
-router.get("/productlist/:orderid", getOrderProductListByOrderId);
-router.get("/deliverylist/:orderid", getDeliveryListByOrderId);
+// router.get("/:id", getOrderDetails);
+// router.get("/", getOrderList);
+router.post("/:id", addOrderBySiteManager);
+// router.post("/sitemanager/confirmorder/:id", comfirmOrderBySiteManager);
+// router.post("/manager/approve/:orderid", approvedOrDisapprovedOrderByManager);
+// router.post(
+//   "/procurementofficer/placedorder/:orderid",
+//   placedOrderByProcurementOfficer
+// );
+// router.post("/supplier/accept/:orderid", acceptOrderBySuppiler);
+// router.post("/supplier/unaccept/:orderid", unacceptOrderBySuppiler);
+// router.post(
+//   "/supplier/pricechange/:orderid/:orderproductid",
+//   updateProductPriceInOrderBySupplier
+// );
+// router.post(
+//   "/sitemanager/closed/:orderid",
+//   closeOrderAfterDeliveryCompletedBySiteManager
+// );
+// router.get("/sitemanager/site/:siteid", getOrderListBySiteId);
+// router.get("/draft/sitemanager/site/:siteid", getDraftOrderListBySiteId);
+// router.get("/productlist/:orderid", getOrderProductListByOrderId);
+// router.get("/deliverylist/:orderid", getDeliveryListByOrderId);
 
 module.exports = router;

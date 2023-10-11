@@ -89,42 +89,6 @@ const getDraftOrderListBySiteId = async (req, res) => {
   }
 };
 
-const products = [
-  { key: "1", value: "metal", price: 300 },
-  { key: "2", value: "sand", price: 400 },
-  { key: "3", value: "cement", price: 1000 },
-  { key: "4", value: "paint", price: 500 },
-  { key: "5", value: "bricks", price: 100 },
-  { key: "6", value: "iron bars", price: 450 },
-];
-
-const suppliers = {
-  1: [
-    { key: "7", value: "kamal hardware" },
-    { key: "8", value: "sachin hardware" },
-  ],
-  2: [
-    { key: "9", value: "pasindu hardware" },
-    { key: "10", value: "nimal hardware" },
-  ],
-  3: [
-    { key: "11", value: "saman hardware" },
-    { key: "12", value: "viraj hardware" },
-  ],
-  4: [
-    { key: "13", value: "ganidu hardware" },
-    { key: "14", value: "ravin hardware" },
-  ],
-  5: [
-    { key: "15", value: "namal hardware" },
-    { key: "16", value: "anoj hardware" },
-  ],
-  6: [
-    { key: "17", value: "nirmal hardware" },
-    { key: "18", value: "dasun hardware" },
-  ],
-};
-
 //get Delivery List By Site Id
 const getDeliveryListByOrderId = async (req, res) => {
   try {
@@ -249,12 +213,16 @@ const unacceptOrderBySuppiler = async (req, res) => {
 
 //add Order by Site Manager
 const addOrderBySiteManager = async (req, res) => {
-  const { placedDate, requiredDate, supplier } = req.body;
+  const { placedDate, requiredDate, productList } = req.body;
   const isDraft = true;
   const approvalStatus = false;
   const isRestricted = false;
   const status = "draft";
   const totalPrice = 0;
+
+  const site = await Site.findById(req.params.id);
+
+  if (!site) return res.send("Some Data fields are not found!");
 
   try {
     const order = new Order({
@@ -263,27 +231,37 @@ const addOrderBySiteManager = async (req, res) => {
       requiredDate,
       approvalStatus,
       isRestricted,
+      productList,
       status,
       totalPrice,
-      supplier,
-      site: {
-        _id: req.params.siteid,
-      },
+      site: req.params.id,
     });
 
-    order.save().then((orderObject) => {
-      Site.findByIdAndUpdate(req.params.siteid).then((existingSite) => {
-        existingSite.orderList.unshift(orderObject);
-        existingSite.save().then(() => {
-          Supplier.findByIdAndUpdate(supplier._id).then((existingSuppiler) => {
-            existingSuppiler.orderList.unshift(orderObject);
-            existingSuppiler.save().then(() => {
-              res.json(orderObject);
-            });
-          });
+    const newOrder = await order.save();
+
+    site.orderList.unshift(newOrder._id);
+
+    for (let i = 0; i < productList.length; i++) {
+      await Supplier.findByIdAndUpdate({
+        _id: productList[i].supplier,
+      }).then((sup) => {
+        console.log("found");
+        console.log(sup.orderList);
+        sup.orderList.unshift({
+          product: productList[i].product,
+          site: site._id,
+          quantity: productList[i].qnty,
+          requiredDate: requiredDate,
+          orderRef: newOrder._id,
         });
+        sup.save();
+        console.log(1);
       });
-    });
+      console.log(2);
+    }
+    console.log(3);
+    res.json({ message: "successful!" });
+    console.log(4);
   } catch (err) {
     //Something wrong with the server
     console.log(err.message);

@@ -20,8 +20,12 @@ const SupplierSchema = new Schema({
   },
   orderList: [
     {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Order",
+      product: { type: String, required: true },
+      site: { type: mongoose.Schema.Types.ObjectId, ref: "Site" },
+      quantity: { type: Number, required: true },
+      requiredDate: { type: String, required: true },
+      status: { type: String, required: true, default: "pending" },
+      orderRef: { type: mongoose.Schema.Types.ObjectId, ref: "Order" },
     },
   ],
   productList: [

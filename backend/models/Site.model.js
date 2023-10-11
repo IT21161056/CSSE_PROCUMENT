@@ -15,6 +15,7 @@ const SiteSchema = new Schema({
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Order",
+      default: [],
     },
   ],
   siteManager: {
