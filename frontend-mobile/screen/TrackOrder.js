@@ -1,17 +1,7 @@
 import React from "react";
 import { FlatList, SafeAreaView, StyleSheet, View } from "react-native";
 import OrderCard from "../components/OrderCard";
-
-const orders = [
-  { id: 1, date: "2023/10/12", status: "approved", totalCost: 5000000 },
-  { id: 2, date: "2023/10/12", status: "waiting", totalCost: 5000000 },
-  { id: 3, date: "2023/10/12", status: "waiting", totalCost: 5000000 },
-  { id: 4, date: "2023/10/12", status: "declined", totalCost: 5000000 },
-  { id: 5, date: "2023/10/12", status: "approved", totalCost: 5000000 },
-  { id: 6, date: "2023/10/12", status: "waiting", totalCost: 5000000 },
-  { id: 7, date: "2023/10/12", status: "declined", totalCost: 5000000 },
-  { id: 8, date: "2023/10/12", status: "approved", totalCost: 5000000 },
-];
+import { orders } from "../assets/data/db";
 
 export default function TrackOrder() {
   return (
