@@ -8,16 +8,17 @@ const {
   getAcceptedOrCompletedOrdersForEachSupplier,
   getSupplierDetailsById,
   getSuppliersByProduct,
+  updateSupplierDetails,
+  deleteSupplier
 } = require("../controllers/supplier.controller");
 
-router.get(
-  "/:id/acceptedorcompletedorders",
-  getAcceptedOrCompletedOrdersForEachSupplier
-);
 router.post("/", registerSupplier);
 router.post("/login", loginSupplier);
 router.get("/", getSupplierList);
+router.put("/updateSupplier",updateSupplierDetails);
+router.delete("/deleteSupplier/:id", deleteSupplier);
 router.get("/byItem", getSuppliersByProduct);
-router.get("/:id", getSupplierDetailsById);
+router.get("/byId/:id", getSupplierDetailsById);
+router.get("/:id/acceptedorcompletedorders",getAcceptedOrCompletedOrdersForEachSupplier);
 
 module.exports = router;
