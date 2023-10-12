@@ -10,7 +10,7 @@ export default function OrderPage2({ route }) {
   let item = params;
   const { order } = route.params;
   console.log(order)
-  
+
   useEffect(() => {
     let today = new Date();
     let date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
@@ -54,7 +54,7 @@ export default function OrderPage2({ route }) {
           <Text style={{ fontSize: 19, color: 'white' }} title='Confirm'>Confirm</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.draft} title="Draft" onPress={()=>{ }}>
+        <TouchableOpacity style={styles.draft} title="Draft" onPress={() => { }}>
           <Text style={{ fontSize: 19, color: 'white' }} title='Draft'>Draft</Text>
         </TouchableOpacity>
       </View>
