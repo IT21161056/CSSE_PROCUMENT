@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, Button, StyleSheet, TextInput, Alert, SafeAreaView, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { SelectList } from 'react-native-dropdown-select-list'
 import Icon from "react-native-vector-icons/Ionicons";
+import axios from 'axios'
 
 export default function PlaceOrder() {
 
@@ -12,6 +13,44 @@ export default function PlaceOrder() {
   const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
   const [total, setTotal] = useState(0);
+  const [productlist,setProductList] = useState([])
+  const [sitelist, setSites] = useState([])
+
+  const [siteInfo, setSiteInfo] = useState({ key: value, name: '' });
+  
+
+  const siteNames = sitelist.map((site) => ({
+    key: site._id,  // Displayed in the dropdown
+    value: site.siteName, 
+  }));
+  const productNames = productlist.map((product) => (product.productName))
+
+  const fetchSiteList = async () => {
+    try {
+      const res = await axios.get("http://192.168.43.95:8072/site/")
+      const data = res.data;
+      return (data)
+    } catch (error) {
+      console.error("Error fetching site list:", error);
+      throw error;
+    }
+  };
+  
+  const fetchProductList = async () => {
+    try {
+      const res = await axios.get("http://192.168.43.95:8072/product/")
+      const data = res.data;
+      return (data)
+    } catch (error) {
+      console.error("Error fetching product list:", error);
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    fetchSiteList().then((data) => setSites(data));
+    fetchProductList().then((data) => setProductList(data));
+  }, [])
 
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
@@ -41,12 +80,14 @@ export default function PlaceOrder() {
   const [price, setPrice] = useState(0)
   const [prods, setProds] = useState([])
 
+  console.log(prods)
   const handleOrder = () => {
 
     const calculatedTotal = calculateTotal(prods);
 
     const newOrder = {
-      site: sites.find(item => item.key === site).value,
+      site: siteInfo.value,
+      siteId : siteInfo.key,
       selectedDate,
       prods,
       total: calculatedTotal
@@ -56,7 +97,7 @@ export default function PlaceOrder() {
     setSupplier("");
     setProduct("");
     setQnty("");
-    navigation.navigate('Place2', { order })
+    // navigation.navigate('Place2', { order })
 
   };
 
@@ -64,13 +105,13 @@ export default function PlaceOrder() {
   const handleProducts = () => {
     if (supplier && product && qnty) {
       // Find the selected product and its price
-      const selectedProduct = products.find(item => item.key === product);
+      
       // Find the selected supplier and its price
       const selectedSupplier = suppliers[product].find(item => item.key === supplier);
 
-      if (selectedProduct && selectedSupplier) {
+      if (selectedSupplier) {
         const newItem = {
-          product: selectedProduct.value,
+          product: product,
           supplier: selectedSupplier.value,
           qnty,
           price: selectedSupplier.price  // Set the product price
@@ -91,22 +132,14 @@ export default function PlaceOrder() {
     return total;
   };
 
-  const sites = [
-    { key: 's1', value: 'Colombo' },
-    { key: 's2', value: 'Kandy' },
-    { key: 's3', value: 'Kurunegala' },
-    { key: 's4', value: 'Galle' }
-  ]
-
-
-  const products = [
-    { key: '1', value: 'metal' },
-    { key: '2', value: 'sand' },
-    { key: '3', value: 'cement' },
-    { key: '4', value: 'paint' },
-    { key: '5', value: 'bricks' },
-    { key: '6', value: 'iron bars' },
-  ]
+  // const products = [
+  //   { key: '1', value: 'metal' },
+  //   { key: '2', value: 'sand' },
+  //   { key: '3', value: 'cement' },
+  //   { key: '4', value: 'paint' },
+  //   { key: '5', value: 'bricks' },
+  //   { key: '6', value: 'iron bars' },
+  // ]
 
   const suppliers = {
     '1': [
@@ -148,8 +181,12 @@ export default function PlaceOrder() {
       <View style={{ marginTop: 50, justifyContent: 'center', alignItems: 'center' }}>
         <Text style={{ fontSize: 18, fontWeight: "600", marginRight: 20, marginLeft: -240, top: -13 }}>Select Site</Text>
         <SelectList
-          setSelected={(val) => setSite(val)}
-          data={sites}
+          setSelected={(val) => {
+            const selectedSite = sitelist.find(item => item._id === val);
+            const value = selectedSite ? selectedSite.siteName : 'Unknown Site';
+            setSiteInfo({ key: val, value });
+          }}
+          data={siteNames}
           placeholder="Select supplier"
           boxStyles={{ borderColor: '#ffa366', height: 50, width: 350, top: -10 }}
         />
@@ -172,7 +209,7 @@ export default function PlaceOrder() {
         <Text style={{ fontSize: 18, fontWeight: "600", marginLeft: -230, bottom: 8 }}>Select product</Text>
         <SelectList
           setSelected={(val) => setProduct(val)}
-          data={products}
+          data={productNames}
           placeholder="Select product"
           boxStyles={{ borderColor: '#ffa366', height: 50, width: 350 }}
         />
