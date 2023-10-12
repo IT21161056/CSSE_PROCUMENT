@@ -1,19 +1,20 @@
 // const bcrypt = require("bcryptjs");
+const { request, response } = require("express");
 const Supplier = require("../models/Supplier.model");
 // const jwt = require("jsonwebtoken");
 const config = require("config");
 
 //get Supplier details by id
-const getSupplierDetailsById = async (req, res) => {
+const getSupplierDetailsById = async ( request, response ) => {
   try {
     //get user details
     //-password : dont return the pasword
-    const user = await Supplier.findById(req.params.id).select("-password");
+    const user = await Supplier.findById(request.params.id).select("-password");
 
-    res.json(user);
+    response.json(user);
   } catch (err) {
     console.log(err.message);
-    res.status(500).send("Server Error");
+    response.status(500).send("Server Error");
   }
 };
 
@@ -39,17 +40,38 @@ const getAcceptedOrCompletedOrdersForEachSupplier = async (req, res) => {
   }
 };
 
-//get Product List
-const getSupplierList = async (req, res) => {
-  try {
-    const supplierList = await Supplier.find();
+//get Supplier List
+const getSupplierList = async (request, response) => {
 
-    res.json(supplierList);
-  } catch (err) {
-    console.log(err.message);
-    res.status(500).send("Server Error");
+  try {
+    const suppliers = await Supplier.find().lean();
+
+    if( !suppliers) {
+      return response.status(400).json({ message: 'No suppliers found!!'})
+    }
+    response.json(suppliers);
+
+  } catch ( error ) {
+
+    console.log(error.message);
+    response.status(500).send("Server Error");
   }
 };
+
+//get single supplier
+const getSingleSupplier = async ( request, response ) => {
+  const id = request.params.id;
+  console.log(`single supplier id ${id}`);
+
+  let singleSupplier;
+
+  try {
+    singleSupplier = await Supplier.findOne({ _id: id});
+    response.status(200).json(singleSupplier);
+  } catch ( error ) {
+    response.status(401).json(error);
+  }
+}
 
 //Authenticate Supplier and get token
 const loginSupplier = async (req, res) => {
@@ -97,8 +119,8 @@ const loginSupplier = async (req, res) => {
 
 //Register Supplier
 const registerSupplier = async (req, res) => {
-  const { name, email, password, address, contactNumber, productList } =
-    req.body;
+  const { supplierName, email, password, address, contactNumber, productList } = req.body;
+
   console.log(req.body);
   try {
     //See if user Exist
@@ -112,7 +134,7 @@ const registerSupplier = async (req, res) => {
 
     //create a Supplier instance
     user = new Supplier({
-      name,
+      supplierName,
       email,
       password,
       address,
@@ -174,6 +196,60 @@ const getSuppliersByProduct = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
+
+const updateSupplierDetails = async ( request, response ) => {
+  const{
+    supplierName,
+    email,
+    contactNumber,
+    location,
+    productList
+  } = request.body;
+
+  console.log(request.body);
+
+  if( !supplierName || !email || !contactNumber || !location || !productList) {
+    return response.status(400).json({ message: 'All fields are required'});
+  }
+
+  //confirm supplier exist to update
+  const supplier = await Supplier.findById(_id).exec();
+
+  if( !supplier ) {
+    return response.status(400).json({ message: 'Supplier not found!!'});
+  }
+
+  supplier.supplierName = supplierName;
+  supplier.email = email;
+  supplier.contactNumber = contactNumber;
+  supplier.location = location;
+  supplier.productList = productList;
+
+  const updateSupplier = await supplier.save();
+  response.json(`'${updateSupplier.supplier}' updated!`);
+}
+
+const deleteSupplier = async ( request, response ) => {
+  try{
+    const id = request.params.id;
+
+    await Supplier.findByIdAndDelete( id ) 
+    .then(() => {
+      response.status(200).json({ message: 'Order Deleted'});
+    }).catch(( error ) => {
+
+      //confirm data
+      if( !id ) 
+        return response.status(400).json({ message: 'Order not found!!'})
+      else
+        response.json({ message: 'Error with delete item ', error: error.message});
+      
+    });
+  } catch ( error ) {
+    response.json({ message: error.message});
+  }
+}
+
 module.exports = {
   getSupplierList,
   loginSupplier,
@@ -181,4 +257,6 @@ module.exports = {
   getAcceptedOrCompletedOrdersForEachSupplier,
   getSupplierDetailsById,
   getSuppliersByProduct,
+  updateSupplierDetails,
+  deleteSupplier
 };
