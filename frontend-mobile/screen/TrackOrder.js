@@ -1,9 +1,27 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FlatList, SafeAreaView, StyleSheet, View } from "react-native";
 import OrderCard from "../components/OrderCard";
-import { orders } from "../assets/data/db";
+// import { orders } from "../assets/data/db";
+import axios from "axios";
 
 export default function TrackOrder() {
+  const [orders, setOrders] = useState([]);
+
+  useEffect(() => {
+    const fetch = async () => {
+      await axios
+        .get("http://192.168.1.100:8072/order")
+        .then((res) => {
+          console.log(res.data);
+          setOrders(res.data);
+        })
+        .catch((err) => {});
+    };
+    fetch();
+  }, []);
+
+  console.log(orders);
+
   return (
     <View>
       <FlatList

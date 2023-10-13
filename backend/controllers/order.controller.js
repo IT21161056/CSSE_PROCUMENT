@@ -213,11 +213,11 @@ const unacceptOrderBySuppiler = async (req, res) => {
 
 //add Order by Site Manager
 const addOrderBySiteManager = async (req, res) => {
-  const { placedDate, requiredDate, productList,totalPrice } = req.body;
+  const { placedDate, requiredDate, productList, totalPrice } = req.body;
   const isDraft = true;
   const approvalStatus = false;
   const isRestricted = false;
-  const status = "draft";
+  const status = "waiting";
   const site = await Site.findById(req.params.id);
 
   if (!site) return res.send("Some Data fields are not found!");
@@ -243,22 +243,19 @@ const addOrderBySiteManager = async (req, res) => {
       await Supplier.findByIdAndUpdate({
         _id: productList[i].supplier,
       }).then((sup) => {
-        
         sup.orderList.unshift({
           product: productList[i].product,
           site: site._id,
           quantity: productList[i].qnty,
           requiredDate: requiredDate,
           orderRef: newOrder._id,
+          supplierName: productList[i].supplierName,
         });
         sup.save();
-        
       });
-      
     }
-   
+
     res.json({ message: "successful!" });
-    
   } catch (err) {
     return res.status(500).send("Server Error");
   }
