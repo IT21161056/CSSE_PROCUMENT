@@ -23,9 +23,13 @@ app.use("/product", productRoutes);
 const siteRoutes = require("./routes/site.routes.js");
 app.use("/site", siteRoutes);
 
+const orderReviewRoutes = require("./routes/OrderReview.routes.js");
+app.use("/orderReview", orderReviewRoutes);
+
 // pasindu route
 const supplierRoute = require("./routes/supplier.routes.js");
 app.use("/supplier", supplierRoute);
+
 const supplierReportRoute = require("./routes/supplierReport.routes.js");
 app.use("/orders_pdf", supplierReportRoute);
 

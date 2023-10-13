@@ -16,13 +16,48 @@ import {
   TextInput,
 } from "react-native-paper";
 import TableRow from "../components/TableRow";
+import axios from "axios";
 
 const ReviewOrder = ({ route }) => {
   const { params } = useRoute();
+  const itemData = route.params.order;
   const [visible, setVisible] = React.useState(false);
   const [review, setReview] = useState("");
 
-  const itemData = route.params.order;
+  const [subOrderList, setSubOrders] = useState(itemData.orderList);
+
+  const getSubOrderId = (id) => {
+    const getSubOrderList = subOrderList.map((ob) => {
+      if (ob.id === id) {
+        return {
+          ...ob,
+          isComplete: true,
+        };
+      } else if (ob.isComplete) {
+        return ob;
+      } else {
+        return {
+          ...ob,
+          isComplete: false,
+        };
+      }
+    });
+
+    setSubOrders(getSubOrderList);
+  };
+
+  const submit = () => {
+    const reviewedOrder = {
+      ...itemData,
+      orderList: [...subOrderList],
+      review: review,
+    };
+
+    axios
+      .post("http://192.168.1.101:8072/orderReview", reviewedOrder)
+      .then((res) => {})
+      .catch((err) => {});
+  };
 
   return (
     <PaperProvider>
@@ -35,7 +70,7 @@ const ReviewOrder = ({ route }) => {
         </View>
         <ScrollView scrollEnabled={true} style={{ height: 300 }}>
           {itemData.orderList.map((order, index) => (
-            <TableRow key={index} order={order} />
+            <TableRow key={index} order={order} getSubOrderId={getSubOrderId} />
           ))}
         </ScrollView>
         <View style={styles.infoSection}>
@@ -74,6 +109,7 @@ const ReviewOrder = ({ route }) => {
               buttonColor="#426252"
               uppercase
               style={{ paddingLeft: 30, paddingRight: 30 }}
+              onPress={submit}
             >
               Save
             </Button>
@@ -90,7 +126,6 @@ const ReviewOrder = ({ route }) => {
               label="add review"
               onChangeText={(e) => setReview(e)}
             />
-            <Text>{review}</Text>
           </Modal>
         </Portal>
       </SafeAreaView>
