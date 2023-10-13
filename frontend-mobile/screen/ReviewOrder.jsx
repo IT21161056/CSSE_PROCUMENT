@@ -16,13 +16,29 @@ import {
   TextInput,
 } from "react-native-paper";
 import TableRow from "../components/TableRow";
+import axios from "axios";
 
 const ReviewOrder = ({ route }) => {
   const { params } = useRoute();
   const [visible, setVisible] = React.useState(false);
   const [review, setReview] = useState("");
+  const [completeSubOrders, setCompleteSubOrders] = useState([]);
 
+  const getSubOrderId = (id) => {
+    setCompleteSubOrders([...completeSubOrders, id]);
+  };
   const itemData = route.params.order;
+
+  const submit = () => {
+    const reviewedOrder = {
+      review: review,
+    };
+
+    axios
+      .post("http://localhost:8072/reviewedOrder")
+      .then((res) => {})
+      .catch((err) => {});
+  };
 
   return (
     <PaperProvider>
@@ -35,7 +51,7 @@ const ReviewOrder = ({ route }) => {
         </View>
         <ScrollView scrollEnabled={true} style={{ height: 300 }}>
           {itemData.orderList.map((order, index) => (
-            <TableRow key={index} order={order} />
+            <TableRow key={index} order={order} getSubOrderId={getSubOrderId} />
           ))}
         </ScrollView>
         <View style={styles.infoSection}>
@@ -74,6 +90,7 @@ const ReviewOrder = ({ route }) => {
               buttonColor="#426252"
               uppercase
               style={{ paddingLeft: 30, paddingRight: 30 }}
+              onPress={submit}
             >
               Save
             </Button>
@@ -90,7 +107,6 @@ const ReviewOrder = ({ route }) => {
               label="add review"
               onChangeText={(e) => setReview(e)}
             />
-            <Text>{review}</Text>
           </Modal>
         </Portal>
       </SafeAreaView>

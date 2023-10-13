@@ -50,20 +50,4 @@ const OrderSchema = new Schema({
   },
 });
 
-// order_document = {
-//   requiredDate: { type: String, required: true },
-//   site: { type: String, required: true },
-// };
-
-// productList: [
-//   {
-//     item: { type: String, required: true },
-//     suppliers: [
-//       {
-//         name: { type: String, required: true },
-//         qty: { type: Number, required: true },
-//       },
-//     ],
-//   },
-// ]
 module.exports = Order = mongoose.model("Order", OrderSchema);

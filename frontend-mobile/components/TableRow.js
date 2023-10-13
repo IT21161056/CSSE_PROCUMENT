@@ -2,8 +2,13 @@ import React, { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Checkbox } from "react-native-paper";
 
-const TableRow = ({ order }) => {
+const TableRow = ({ order, getSubOrderId }) => {
   const [checked, setChecked] = useState(false);
+
+  const setData = (id) => {
+    getSubOrderId(id);
+    setChecked(true);
+  };
   return (
     <View style={styles.tableRow}>
       <View style={{ ...styles.rowData }}>
@@ -19,7 +24,7 @@ const TableRow = ({ order }) => {
         <Checkbox
           status={checked ? "checked" : "unchecked"}
           onPress={() => {
-            setChecked(!checked);
+            setData(order.id);
           }}
           color="#111212"
         />
