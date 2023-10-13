@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios';
-import { Button, Grid, IconButton, InputAdornment, TextField, Typography } from '@mui/material'
+import { Button, Grid, IconButton, InputAdornment, TextField, Typography, Link } from '@mui/material'
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -9,20 +9,23 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import SearchIcon from '@mui/icons-material/Search';
-import jsPDF from 'jspdf';
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import {saveAs} from 'file-saver';
 
 const SupplierList = () => {
 
     const [suppliers, setSuppliers] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
 
+    const suppliersArray  = suppliers;
+    console.log(suppliersArray);
+
     useEffect(() => {
    
         function fetchSupplierData() {
         axios
-            .get('http://localhost:8072/supplier/')
+            .get('http://localhost:8072/supplier/all')
             .then(( response ) => {
             console.log(response.data)
             setSuppliers(response.data);
@@ -34,42 +37,29 @@ const SupplierList = () => {
         fetchSupplierData();
     }, [])
 
-        const filterOrders = suppliers.filter(( item ) => {
-        const { supplierName } = item;
+    const filterSuppliers = suppliers.filter(( item ) => {
+        const { supplierName, email } = item;
         const lowerCaseQuery = searchQuery.toLowerCase();
 
         return(
-            supplierName.toLowerCase().includes(lowerCaseQuery)
+            supplierName && supplierName.toLowerCase().includes(lowerCaseQuery) ||
+            email && email.toLowerCase().includes(lowerCaseQuery)
         );
     });
 
-    const generateReport = (orders) => {
-        const doc = new jsPDF();
-    
+    function createAndDownLoadPdf(){
+        axios.post('http://localhost:8072/orders_pdf/create-pdf', suppliersArray)
+        .then(() => axios.get('http://localhost:8072/orders_pdf/fetch-pdf', {responseType:'blob'}))
+        .then((res)=>{
 
-    const columns = [
-        {title: 'Supplier ID', dataKey : 'supplierID'},
-        {title: 'Supplier Name', dataKey : 'supplierName'},
-        {title: 'Item', dataKey : 'item'},
-    ];
+            console.log(res.data)
+            const pdfBlob = new Blob([res.data], {type:'application/pdf'})
 
-    const data = orders.map (( order ) => ({
-        supplierID: order.supplierID,
-        supplierName: order.supplierName,
-        item: order.item
-    }));
+            saveAs(pdfBlob, 'Suppllier Report.pdf')
+        })
+    }
 
-    doc.autoTableSetDefaults({
-      startY: 20,
-      margin: { top: 20},
-      headStyles: { fillColor: [41, 128, 185], textColor: 255 },
-      bodyStyles: { textColor: 0 },
-    });
 
-    doc.autoTable(columns, data);
-
-    doc.save('order_report.pdf');
-    };  
   return (
     <Grid container spacing={2} sx={{ alignItems: 'flex-start', marginTop: '1rem'}}>
         <Grid item xs={12} sm={6}  sx={{ textAlign: 'center'}}>
@@ -86,9 +76,7 @@ const SupplierList = () => {
             <Button
                 variant='contained'
                 color= 'warning'
-                onClick={ () => {
-                    generateReport(filterOrders);
-                }}
+                onClick ={createAndDownLoadPdf}
             >
                 Generate Report
             </Button>
@@ -126,29 +114,35 @@ const SupplierList = () => {
                     <TableHead sx={{backgroundColor: '#FF9933'}}>
                         <TableRow>
                             <TableCell>Supplier Name</TableCell>
+                            <TableCell>E-mail</TableCell>
                             <TableCell>Location</TableCell>
-                            <TableCell>Email</TableCell>
                             <TableCell>Contact Number</TableCell>
                             <TableCell>Products</TableCell>
+                            <TableCell>Orders</TableCell>
                             <TableCell>Action</TableCell>
                         </TableRow>
                     </TableHead>
 
                     <TableBody>
-                    {filterOrders.map(( item ) => {
+                    {filterSuppliers.map(( item ) => {
                         return(
                         <TableRow key={item._id}>
                             <TableCell>{item.supplierName}</TableCell>
+                            <TableCell>{item.email}</TableCell>
                             <TableCell>{item.location}</TableCell>
-                            <TableCell>{item.idNumber}</TableCell>
-                            <TableCell>{item.mobileNumber}</TableCell>
-                            <TableCell>
+                            <TableCell>{item.contactNumber}</TableCell>
+                            <TableCell><Button/></TableCell>
+                            {/* <TableCell>
                                 <Button>
                                     View More
                                 </Button>
-                            </TableCell>
+                            </TableCell> */}
                             <TableCell>
-                                <IconButton>
+                                <IconButton sx={{ backgroundColor: "primary" }}>
+                                    <Link
+                                        to={`/dashboard/updateSupplier/${item._id}`}
+                                        state={{ orderData: item }}
+                                    ></Link>
                                     <EditNoteIcon/>
                                 </IconButton>
                                 <IconButton>
