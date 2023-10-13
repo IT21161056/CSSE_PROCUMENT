@@ -76,6 +76,7 @@ const styles = StyleSheet.create({
   },
   tableRow: {
     flexDirection: 'row',
+    justifyContent:'space-between',
     marginLeft: 2,
     padding: 10,
     gap: 40

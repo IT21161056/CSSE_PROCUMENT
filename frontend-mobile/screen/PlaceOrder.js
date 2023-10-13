@@ -5,6 +5,7 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { SelectList } from 'react-native-dropdown-select-list'
 import Icon from "react-native-vector-icons/Ionicons";
 import axios from 'axios'
+import {Ip} from '../Ip'
 
 export default function PlaceOrder() {
 
@@ -40,7 +41,7 @@ export default function PlaceOrder() {
   }));
 
   const productNames = productlist.map((product) => (product.productName))
-
+  
   const supList = supplierlist.flatMap((supplier) => {
     return supplier.productList.map((product) => ({
       value: `${supplier.name} Rs. ${product.price}.00`,
@@ -50,7 +51,7 @@ export default function PlaceOrder() {
 
   const fetchSiteList = async () => {
     try {
-      const res = await axios.get("http://192.168.8.166:8072/site/")
+      const res = await axios.get(`http://${Ip}:8072/site/`)
       const data = res.data;
       return (data)
     } catch (error) {
@@ -61,7 +62,7 @@ export default function PlaceOrder() {
 
   const fetchProductList = async () => {
     try {
-      const res = await axios.get("http://192.168.8.166:8072/product/")
+      const res = await axios.get(`http://${Ip}:8072/product/`)
       const data = res.data;
       return (data)
     } catch (error) {
@@ -122,7 +123,7 @@ export default function PlaceOrder() {
   const getSupplierByProduct = async (itemName) => {
     setProduct(itemName)
     try {
-      const res = await axios.get(`http://192.168.8.166:8072/supplier/byItem?itemName=${itemName}`)
+      const res = await axios.get(`http://${Ip}:8072/supplier/byItem?itemName=${itemName}`)
       setSupplierList(res.data)
 
     } catch (error) {
@@ -145,7 +146,7 @@ export default function PlaceOrder() {
     }
   };
 
-
+  //calculate cost for the order
   const calculateTotal = (prods) => {
     let total = 0;
     prods.forEach((product) => {
