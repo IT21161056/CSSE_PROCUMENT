@@ -5,7 +5,7 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { SelectList } from 'react-native-dropdown-select-list'
 import Icon from "react-native-vector-icons/Ionicons";
 import axios from 'axios'
-import {Ip} from '../Ip'
+import { Ip } from '../Ip'
 
 export default function PlaceOrder() {
 
@@ -13,19 +13,20 @@ export default function PlaceOrder() {
 
   const [value, setValue] = useState(null);
   const [total, setTotal] = useState(0);
-  const [productlist, setProductList] = useState([])
+  const [productList, setProductList] = useState([])
   const [sitelist, setSites] = useState([])
   const [supplierlist, setSupplierList] = useState([])
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [siteInfo, setSiteInfo] = useState({ key: value, name: '' });
   const [order, setOrder] = useState([])
   const [site, setSite] = useState();
-  const [selectedDate, setSelectedDate] = useState('required Date')
+  const [requiredDate, setSelectedDate] = useState('required Date')
   const [supplier, setSupplier] = useState();
   const [product, setProduct] = useState();
   const [qnty, setQnty] = useState();
   const [price, setPrice] = useState(0)
   const [prods, setProds] = useState([])
+  const [date, setDate] = useState(null);
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -40,11 +41,11 @@ export default function PlaceOrder() {
     value: site.siteName,
   }));
 
-  const productNames = productlist.map((product) => (product.productName))
-  
+  const productNames = productList.map((product) => (product.productName))
   const supList = supplierlist.flatMap((supplier) => {
     return supplier.productList.map((product) => ({
-      value: `${supplier.name} Rs. ${product.price}.00`,
+      value: `${supplier.supplierName} Rs. ${product.price}.00`,
+      label: supplier._id
     }));
   });
 
@@ -86,29 +87,33 @@ export default function PlaceOrder() {
     hideDatePicker();
   };
 
+
   const handleOrder = () => {
     const calculatedTotal = calculateTotal(prods);
     const newOrder = {
       site: siteInfo.value,
       siteId: siteInfo.key,
-      selectedDate,
-      prods,
-      total: calculatedTotal
+      placedDate: date,
+      requiredDate,
+      productList: prods,
+      totalPrice: calculatedTotal
     };
     setTotal(calculatedTotal);
     setOrder([...order, newOrder]);
     setSupplier("");
     setProduct("");
     setQnty("");
-    navigation.navigate('Place2', { order })
+    navigation.navigate('Place2', { order: [...order, newOrder] });
 
   };
+
 
   const handleProducts = () => {
     if (supplier && product && qnty) {
       const newItem = {
         product: product,
-        supplier: supplier,
+        supplierName: supplier.name,
+        supplier: supplier.id,
         qnty,
         price
       };
@@ -120,6 +125,7 @@ export default function PlaceOrder() {
   };
 
 
+  //fetch the suppliers list when site manager select the product
   const getSupplierByProduct = async (itemName) => {
     setProduct(itemName)
     try {
@@ -135,16 +141,24 @@ export default function PlaceOrder() {
   const handleSelect = (val) => {
     const selectedProduct = supList.find((product) => product.value === val);
     if (selectedProduct) {
-      // Extract the supplier name from the selected product's value
       const supplierName = selectedProduct.value.split(' Rs. ')[0];
-      // Extract the price from the selected product's value
+
       const priceMatch = selectedProduct.value.match(/Rs\. (\d+\.\d+)/);
       const selectedPrice = priceMatch ? parseFloat(priceMatch[1]) : 0;
-      // Update the selected supplier (only the name) and price
-      setSupplier(supplierName);
+
+      const supplierId = selectedProduct.label;
+
+      setSupplier({ name: supplierName, id: supplierId });
       setPrice(selectedPrice);
     }
   };
+
+
+  useEffect(() => {
+    let today = new Date();
+    let date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+    setDate(date);
+  }, []);
 
   //calculate cost for the order
   const calculateTotal = (prods) => {
@@ -183,7 +197,7 @@ export default function PlaceOrder() {
             onConfirm={handleConfirm}
             onCancel={hideDatePicker}
           />
-          <TextInput style={styles.input1} placeholder="date" value={selectedDate} />
+          <TextInput style={styles.input1} placeholder="date" value={requiredDate} />
         </TouchableOpacity>
       </View>
 
