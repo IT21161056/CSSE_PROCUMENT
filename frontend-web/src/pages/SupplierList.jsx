@@ -103,7 +103,7 @@ const SupplierList = () => {
 
         <TableContainer sx={{ 
                               maxHeight: '70vh', 
-                              padding: 1, 
+                              paddingLeft: '1rem', 
                               margin: '1rem',
                               alignItems: 'center',
                               justifyContent: 'center',
@@ -111,7 +111,7 @@ const SupplierList = () => {
                             }}
         >
                 <Table>
-                    <TableHead sx={{backgroundColor: '#FF9933'}}>
+                    <TableHead sx={{backgroundColor: '#FF9933', zIndex: 1, position: 'sticky', top: 0}}>
                         <TableRow>
                             <TableCell>Supplier Name</TableCell>
                             <TableCell>E-mail</TableCell>
@@ -131,12 +131,24 @@ const SupplierList = () => {
                             <TableCell>{item.email}</TableCell>
                             <TableCell>{item.location}</TableCell>
                             <TableCell>{item.contactNumber}</TableCell>
-                            <TableCell><Button/></TableCell>
-                            {/* <TableCell>
-                                <Button>
+                            <TableCell>
+                                <Button
+                                    variant='outlined'
+                                    size='small'
+                                    color='warning'
+                                >
                                     View More
                                 </Button>
-                            </TableCell> */}
+                            </TableCell>
+                            <TableCell>
+                                <Button
+                                    variant='outlined'
+                                    size='small'
+                                    color='warning'
+                                >
+                                    View More
+                                </Button>
+                            </TableCell>
                             <TableCell>
                                 <IconButton sx={{ backgroundColor: "primary" }}>
                                     <Link
@@ -146,7 +158,9 @@ const SupplierList = () => {
                                     <EditNoteIcon/>
                                 </IconButton>
                                 <IconButton>
-                                    <DeleteForeverIcon/>
+                                    <DeleteForeverIcon
+                                        color='error'
+                                    />
                                 </IconButton>
                             </TableCell>
                         </TableRow>

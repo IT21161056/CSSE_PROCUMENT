@@ -25,7 +25,6 @@ const SupplierReg = () => {
     email: "",
     loction: "",
     contactNumber: "",
-    // password: "",
     addedDate: "",
     productList: "",
   });
@@ -52,7 +51,6 @@ const SupplierReg = () => {
           email: "",
           location: "",
           contactNumber: "",
-          // password: "",
           addedDate:"",
           productList: "",
         })

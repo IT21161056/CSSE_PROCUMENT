@@ -45,7 +45,7 @@ const getAcceptedOrCompletedOrdersForEachSupplier = async (req, res) => {
 const addNewSupplier = async ( request, response ) => {
   const { supplierName, email, location, contactNumber, productList } = request.body;
 
-  if ( !supplierName || !email || !location || !contactNumber || !productList || !orderList) {
+  if ( !supplierName || !email || !location || !contactNumber || !productList) {
     return response.status(400).json({ message: 'All fields are required'});
   }
 
@@ -70,7 +70,7 @@ const getSupplierList = async (request, response) => {
   try {
     const suppliers = await Supplier.find().lean();
 
-    if( !suppliers) {
+    if( !suppliers ) {
       return response.status(400).json({ message: 'No suppliers found!!'})
     }
     response.json(suppliers);
@@ -227,12 +227,13 @@ const updateSupplierDetails = async ( request, response ) => {
     email,
     location,
     contactNumber,
-    productList
+    productList,
+    orderList
   } = request.body;
 
   console.log(request.body);
 
-  if( !supplierName || !email || !contactNumber || !location || !productList) {
+  if( !supplierName || !email || !contactNumber || !location || !productList || !orderList) {
     return response.status(400).json({ message: 'All fields are required'});
   }
 
@@ -248,6 +249,7 @@ const updateSupplierDetails = async ( request, response ) => {
   supplier.email = email;
   supplier.contactNumber = contactNumber;
   supplier.productList = productList;
+  supplier.orderList = orderList;
 
   const updateSupplier = await supplier.save();
   response.json(`'${updateSupplier.supplier}' updated!`);
