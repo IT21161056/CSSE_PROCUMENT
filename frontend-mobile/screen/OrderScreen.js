@@ -34,10 +34,10 @@ export default function OrderScreen() {
             </View>
             {orderItem.productList.map((product, productIndex) => (
               <View key={productIndex} style={styles.tableRow}>
-                <Text style={styles.txt1}>{`Product: ${product.product}`}</Text>
-                <Text style={styles.txt1}>{`Supplier: ${product.supplierName}`}</Text>
-                <Text style={styles.txt1}>{`Qnty: ${product.qnty}`}</Text>
-                <Text style={styles.txt1}>{`Uprice: Rs. ${product.price}.00`}</Text>
+                <Text style={styles.txt1}>{`${product.product}`}</Text>
+                <Text style={styles.txt1}>{`${product.supplierName}`}</Text>
+                <Text style={styles.txt1}>{`${product.qnty}`}</Text>
+                <Text style={styles.txt1}>{`Rs. ${product.price}.00`}</Text>
               </View>
             ))}
             <Text style={styles.order}>{`Placed date : ${orderItem.placedDate}`}</Text>
