@@ -1,24 +1,31 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Box, Button, Grid, MenuItem, Select, TextField, ThemeProvider, Typography, createTheme } from "@mui/material";
+import { Box, Button, Grid, MenuItem, Select, TextField, ThemeProvider, Typography } from "@mui/material";
 import axios from "axios";
 import Container from "@mui/material/Container";
+import { createTheme } from '@mui/material/styles';
 
 const UpdateSupplier = () => {
 
   const { id } = useParams();
   const navigate  = useNavigate();
-  const defaultTheme = createTheme();
 
   const [supplierDetails, setSupplierDetails] = useState({
     supplierName: "",
-    loction: "",
-    idNumber: "",
-    mobileNumber: "",
-    item: ""
+    email: "",
+    location: "",
+    contactNumber: "",
+    productList: ""
   });
 
   console.log(supplierDetails);
+
+  const theme = createTheme({
+  palette: {
+    primary: { main: "#FFA500" },
+    secondary: { main: "#b36b00" },
+  },
+  });
 
   useEffect(() => {
     function fetchSupplierData(){
@@ -57,7 +64,7 @@ const UpdateSupplier = () => {
   }
 
   return (
-    <ThemeProvider theme={defaultTheme}>
+    <ThemeProvider theme={theme}>
       <Container
       maxWidth="md"
       sx={{
