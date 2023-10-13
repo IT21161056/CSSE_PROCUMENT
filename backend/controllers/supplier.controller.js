@@ -204,11 +204,11 @@ const registerSupplier = async (req, res) => {
 
 const getSuppliersByProduct = async (req, res) => {
   try {
-    const { itemName } = req.body;
-
+    // const { itemName } = req.body;
+   const item = req.query.itemName 
     const suppliers = await Supplier.find({
       productList: {
-        $elemMatch: { name: itemName },
+        $elemMatch: { name: item },
       },
     });
 
