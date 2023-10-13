@@ -2,24 +2,25 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const ReviewedSchema = new Schema({
+  orderID: { type: mongoose.Schema.Types.ObjectId, ref: "Order" },
   productList: [
     {
-      price: { type: Number, required: true },
-      product: { type: String, required: true },
-      qnty: { type: Number, required: true },
+      subOrderId: { type: String },
+      isComplete: { type: Boolean },
+      item: { type: String },
+      price: { type: Number },
+      quantity: { type: Number },
       supplier: { type: mongoose.Schema.Types.ObjectId, ref: "Supplier" },
     },
   ],
+  review: { type: String },
+  totalCost: { type: String },
   deliveryList: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Delivery",
     },
   ],
-  supplier: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Supplier",
-  },
   site: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Site",
@@ -36,7 +37,6 @@ const ReviewedSchema = new Schema({
   status: {
     type: String,
   },
-
   totalPrice: {
     type: Number,
     required: true,

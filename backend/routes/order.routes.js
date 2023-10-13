@@ -19,7 +19,7 @@ const {
 } = require("../controllers/order.controller");
 
 // router.get("/:id", getOrderDetails);
-// router.get("/", getOrderList);
+router.get("/", getOrderList);
 router.post("/:id", addOrderBySiteManager);
 // router.post("/sitemanager/confirmorder/:id", comfirmOrderBySiteManager);
 // router.post("/manager/approve/:orderid", approvedOrDisapprovedOrderByManager);

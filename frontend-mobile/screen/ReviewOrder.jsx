@@ -20,22 +20,41 @@ import axios from "axios";
 
 const ReviewOrder = ({ route }) => {
   const { params } = useRoute();
+  const itemData = route.params.order;
   const [visible, setVisible] = React.useState(false);
   const [review, setReview] = useState("");
-  const [completeSubOrders, setCompleteSubOrders] = useState([]);
+
+  const [subOrderList, setSubOrders] = useState(itemData.orderList);
 
   const getSubOrderId = (id) => {
-    setCompleteSubOrders([...completeSubOrders, id]);
+    const getSubOrderList = subOrderList.map((ob) => {
+      if (ob.id === id) {
+        return {
+          ...ob,
+          isComplete: true,
+        };
+      } else if (ob.isComplete) {
+        return ob;
+      } else {
+        return {
+          ...ob,
+          isComplete: false,
+        };
+      }
+    });
+
+    setSubOrders(getSubOrderList);
   };
-  const itemData = route.params.order;
 
   const submit = () => {
     const reviewedOrder = {
+      ...itemData,
+      orderList: [...subOrderList],
       review: review,
     };
 
     axios
-      .post("http://localhost:8072/reviewedOrder")
+      .post("http://192.168.1.101:8072/orderReview", reviewedOrder)
       .then((res) => {})
       .catch((err) => {});
   };
