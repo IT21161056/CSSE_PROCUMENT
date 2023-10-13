@@ -124,7 +124,6 @@ export default function PlaceOrder() {
     }
   };
 
-
   //fetch the suppliers list when site manager select the product
   const getSupplierByProduct = async (itemName) => {
     setProduct(itemName)
@@ -160,6 +159,7 @@ export default function PlaceOrder() {
     setDate(date);
   }, []);
 
+  
   //calculate cost for the order
   const calculateTotal = (prods) => {
     let total = 0;
