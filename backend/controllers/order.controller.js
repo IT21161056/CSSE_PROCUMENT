@@ -217,7 +217,7 @@ const addOrderBySiteManager = async (req, res) => {
   const isDraft = true;
   const approvalStatus = false;
   const isRestricted = false;
-  const status = "draft";
+  const status = "waiting";
   const totalPrice = 0;
 
   const site = await Site.findById(req.params.id);
@@ -245,7 +245,6 @@ const addOrderBySiteManager = async (req, res) => {
       await Supplier.findByIdAndUpdate({
         _id: productList[i].supplier,
       }).then((sup) => {
-        console.log("found");
         console.log(sup.orderList);
         sup.orderList.unshift({
           product: productList[i].product,
@@ -253,15 +252,13 @@ const addOrderBySiteManager = async (req, res) => {
           quantity: productList[i].qnty,
           requiredDate: requiredDate,
           orderRef: newOrder._id,
+          supplierName: productList[i].supplierName,
         });
         sup.save();
-        console.log(1);
       });
-      console.log(2);
     }
-    console.log(3);
+
     res.json({ message: "successful!" });
-    console.log(4);
   } catch (err) {
     //Something wrong with the server
     console.log(err.message);

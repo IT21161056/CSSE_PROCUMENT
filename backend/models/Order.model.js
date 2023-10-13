@@ -11,6 +11,7 @@ const OrderSchema = new Schema({
       product: { type: String, required: true },
       qnty: { type: Number, required: true },
       supplier: { type: mongoose.Schema.Types.ObjectId, ref: "Supplier" },
+      supplierName: { type: String, required: true },
     },
   ],
   deliveryList: [
@@ -19,10 +20,6 @@ const OrderSchema = new Schema({
       ref: "Delivery",
     },
   ],
-  supplier: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Supplier",
-  },
   site: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Site",
