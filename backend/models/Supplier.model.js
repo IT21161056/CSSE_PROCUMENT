@@ -15,9 +15,12 @@ const SupplierSchema = new Schema({
     contactNumber: {
       type: String,
     },
-    // password: {
-    //   type: String,
-    // },
+    productList: [
+      {
+        name: { type: String, required: true },
+        price: { type: Number, required: true },
+      },
+    ],
     orderList: [
       {
         product: { type: String, required: true },
@@ -26,12 +29,6 @@ const SupplierSchema = new Schema({
         requiredDate: { type: String, required: true },
         status: { type: String, required: true, default: "pending" },
         orderRef: { type: mongoose.Schema.Types.ObjectId, ref: "Order" },
-      },
-    ],
-    productList: [
-      {
-        name: { type: String, required: true },
-        price: { type: Number, required: true },
       },
     ],
 });

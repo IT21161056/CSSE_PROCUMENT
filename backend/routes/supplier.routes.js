@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const {
+  addNewSupplier,
   getSupplierList,
   loginSupplier,
   registerSupplier,
@@ -9,13 +10,14 @@ const {
   getSupplierDetailsById,
   getSuppliersByProduct,
   updateSupplierDetails,
-  deleteSupplier
+  deleteSupplier,
 } = require("../controllers/supplier.controller");
 
-router.post("/", registerSupplier);
-router.post("/login", loginSupplier);
-router.get("/", getSupplierList);
-router.put("/updateSupplier",updateSupplierDetails);
+router.post("/add", addNewSupplier)
+router.post("/supplierRegister", registerSupplier);
+router.post("/supplierLogin", loginSupplier);
+router.get("/all", getSupplierList);
+router.put("/update/:id",updateSupplierDetails);
 router.delete("/deleteSupplier/:id", deleteSupplier);
 router.get("/byItem", getSuppliersByProduct);
 router.get("/byId/:id", getSupplierDetailsById);

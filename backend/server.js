@@ -24,8 +24,10 @@ const siteRoutes = require("./routes/site.routes.js");
 app.use("/site", siteRoutes);
 
 // pasindu route
-const supplierRoute = require("./routes/supplier.route.js");
+const supplierRoute = require("./routes/supplier.routes.js");
 app.use("/supplier", supplierRoute);
+const supplierReportRoute = require("./routes/supplierReport.routes.js");
+app.use("/orders_pdf", supplierReportRoute);
 
 const orderRoute = require("./routes/order.routes.js");
 app.use("/order", orderRoute);
