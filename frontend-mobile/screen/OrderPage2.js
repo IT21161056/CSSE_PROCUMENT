@@ -2,13 +2,17 @@ import React, { useEffect, useState } from "react";
 import { View, Text, SafeAreaView, StyleSheet, AsyncStorage, TouchableOpacity, Alert } from "react-native";
 import uuid from 'react-native-uuid';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import axios from "axios";
+import { Ip } from "../Ip";
 
 export default function OrderPage2({ route }) {
 
   const [date, setDate] = useState(null);
   const { params } = useRoute();
   let item = params;
-  const { order } = route.params;//catch the passing data from place Order page
+
+  const { order } = route.params;
+  const [rDate, setRDate] = useState();
 
   const navigation = useNavigation();
 
@@ -18,18 +22,43 @@ export default function OrderPage2({ route }) {
     setDate(date);
   }, []);
 
-  const [rDate, setRDate] = useState();
+  const [{ placedDate, productList, requiredDate, siteId, totalPrice }] = order;//destructure order object
+
+  const transformedOrder = {
+    placedDate,
+    requiredDate,
+    totalPrice,
+    productList: productList.map(({ product, price, qnty, supplier }) => ({
+      product: product,
+      price,
+      qnty: qnty,
+      supplier: supplier
+    }))
+  };
+
+  const sendRequest = () => {
+    axios.post(`http://${Ip}:8072/order/${siteId}`, transformedOrder).then((response) => {
+      console.log(response.data)
+      Alert.alert("Order placed")
+    }).catch((err) => {
+      Alert.alert("Error with place order")
+      console.log(err)
+    })
+  }
+
   useEffect(() => {
     if (order && order.length > 0 && order[0].productList && order[0].productList.length > 0) {
-      const [{ requiredDate }] = order;
+      const [{ requiredDate, siteId }] = order;
       setRDate(requiredDate);
     }
   }, [order]);
+
 
   return (
     <SafeAreaView>
       <View style={styles.container}>
         <Text style={styles.summary}>Order Summary</Text>
+
         <View style={styles.txt}>
           <View style={styles.tableRow1}>
             <Text style={styles.cell}>Product</Text>
@@ -37,9 +66,9 @@ export default function OrderPage2({ route }) {
             <Text style={styles.cell}>Qnty</Text>
             <Text style={styles.cell}>Uprice</Text>
           </View>
+
           {order.map((orderItem, index) => (
             <View key={index}>
-              {/* <Text>{`Order ${index + 1}:`}</Text> */}
               {orderItem.productList.map((product, productIndex) => (
                 <View style={styles.tableRow} key={productIndex}>
                   <Text style={styles.txt1}>{` ${product.product}`}</Text>
@@ -57,8 +86,9 @@ export default function OrderPage2({ route }) {
 
         </View>
       </View>
+
       <View style={{ gap: 25, marginTop: 20 }} >
-        <TouchableOpacity style={styles.confirm} title="Confirm" onPress={() => { navigation.navigate("order") }}>
+        <TouchableOpacity style={styles.confirm} title="Confirm" onPress={sendRequest}>
           <Text style={{ fontSize: 19, color: 'white' }} title='Confirm'>Confirm</Text>
         </TouchableOpacity>
 
@@ -66,9 +96,11 @@ export default function OrderPage2({ route }) {
           <Text style={{ fontSize: 19, color: 'white' }} title='Draft'>Draft</Text>
         </TouchableOpacity>
       </View>
+
     </SafeAreaView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

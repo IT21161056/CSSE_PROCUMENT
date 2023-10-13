@@ -55,7 +55,7 @@ export default function Tab() {
         {() => (
           <Stack.Navigator screenOptions={{ headerShown: "false" }}>
             <Stack.Screen
-              name="place"
+              name="Place Order"
               component={PlaceOrder}
               options={{ headerShown: "false" }}
             />
@@ -89,7 +89,7 @@ export default function Tab() {
         {() => (
           <Stack.Navigator screenOptions={{ headerShown: "false" }}>
             <Stack.Screen
-              name="order"
+              name="Order List"
               component={OrderScreen}
               options={{ headerShown: "false" }}
             />
