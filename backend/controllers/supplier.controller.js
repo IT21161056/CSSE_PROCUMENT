@@ -45,7 +45,7 @@ const getAcceptedOrCompletedOrdersForEachSupplier = async (req, res) => {
 const addNewSupplier = async ( request, response ) => {
   const { supplierName, email, location, contactNumber, productList } = request.body;
 
-  if ( !supplierName || !email || !location || !contactNumber || !productList || !orderList) {
+  if ( !supplierName || !email || !location || !contactNumber || !productList) {
     return response.status(400).json({ message: 'All fields are required'});
   }
 
