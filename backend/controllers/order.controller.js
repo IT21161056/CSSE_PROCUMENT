@@ -213,11 +213,11 @@ const unacceptOrderBySuppiler = async (req, res) => {
 
 //add Order by Site Manager
 const addOrderBySiteManager = async (req, res) => {
-  const { placedDate, requiredDate, productList, totalPrice } = req.body;
+  const { placedDate, requiredDate, productList, totalPrice,siteName } = req.body;
   const isDraft = true;
   const approvalStatus = false;
   const isRestricted = false;
-  const status = "waiting";
+  const status = totalPrice <= 100000 ? "placed" : "waiting"
   const site = await Site.findById(req.params.id);
 
   if (!site) return res.send("Some Data fields are not found!");
@@ -227,6 +227,7 @@ const addOrderBySiteManager = async (req, res) => {
       isDraft,
       placedDate,
       requiredDate,
+      siteName,
       approvalStatus,
       isRestricted,
       productList,

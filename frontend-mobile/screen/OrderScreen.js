@@ -3,9 +3,11 @@ import React, { useEffect, useState } from "react";
 import { View, Text, Alert, StyleSheet, ScrollView } from "react-native";
 import { Ip } from "../Ip";
 
+
 export default function OrderScreen() {
 
   const [orderList, setOrderList] = useState([]);
+
   const sendRequest = () => {
     axios.get(`http://${Ip}:8072/order/`,).then((response) => {
       setOrderList(response.data)
@@ -17,15 +19,16 @@ export default function OrderScreen() {
 
   useEffect(() => {
     sendRequest();
-  }, [])
+  }, [])//send request once to backend with a empty dependency array
 
   return (
     <View style={styles.container}>
-      <Text style={styles.OrderScreen}>OrderScreen</Text>
+      <Text style={styles.OrderScreen}>Order List</Text>
 
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         {orderList.map((orderItem, index) => (
           <View key={index} style={styles.backGround}>
+            <Text style={styles.orderId}>{`O_${index + 101}`}</Text>
             <View style={styles.tableRow1}>
               <Text style={styles.cell}>Product</Text>
               <Text style={styles.cell}>Supplier</Text>
@@ -40,10 +43,13 @@ export default function OrderScreen() {
                 <Text style={styles.txt1}>{`Rs. ${product.price}.00`}</Text>
               </View>
             ))}
-            <Text style={styles.order}>{`Placed date : ${orderItem.placedDate}`}</Text>
-            <Text style={styles.order}>{`Required Date: ${orderItem.requiredDate}`}</Text>
-            {/* <Text style={styles.order}>{`Site Name:  ${orderItem.site}`}</Text> */}
-            <Text style={styles.total}>{`Order Cost:  Rs. ${orderItem.totalPrice}.00`}</Text>
+            <View style={styles.mainOrder}>
+              <Text >{`Placed date : ${orderItem.placedDate}`}</Text>
+              <Text >{`Required Date: ${orderItem.requiredDate}`}</Text>
+              <Text >{`Site Name: ${orderItem.siteName}`}</Text>
+              <Text style={styles.total}>{`Order Cost:  Rs. ${orderItem.totalPrice}.00`}</Text>
+              <Text style={orderItem.status === 'waiting' ? styles.yellow : styles.green}>{`${orderItem.status}`}</Text>
+            </View>
           </View>
         ))}
       </ScrollView>
@@ -62,35 +68,65 @@ const styles = StyleSheet.create({
     fontSize: 25,
     marginTop: 10
   },
-  backGround:{
-    backgroundColor:'gray',
-    borderRadius:10,
-    marginTop:10
+  backGround: {
+    backgroundColor: '#D9D9D9',
+    borderRadius: 10,
+    marginTop: 18,
+    padding: 25,
+    marginLeft:20,
+    marginRight:20
+ 
   },
-  txt1:{
- marginLeft:10
+  mainOrder: {
+    marginLeft: 10
+  },
+  green: {
+    backgroundColor: '#00e600',
+    position: 'absolute',
+    left: 170,
+    bottom: 1,
+    borderRadius: 8,
+    padding: 5,
+    paddingLeft: 10,
+    paddingRight: 10,
+    fontSize: 15
+  },
+  yellow: {
+    backgroundColor: '#ffb366',
+    position: 'absolute',
+    left: 170,
+    bottom: 1,
+    borderRadius: 8,
+    padding: 5,
+    paddingLeft: 10,
+    paddingRight: 10,
+    fontSize: 15
+  },
+  txt1: {
+    marginLeft: 15
   },
   txt: {
     fontSize: 18
   },
   tableRow1: {
     flexDirection: 'row',
-    gap: 50,
-    marginLeft: 4,
+    justifyContent:'space-between',
     alignItems: 'center',
     padding: 10,
     borderColor: '#ccc',
   },
   cell: {
     display: 'flex',
-    
+    justifyContent:'space-between'
+  },
+  orderId: {
+    display: 'flex',
+    marginLeft: 15
   },
   tableRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingBottom:10
- 
-   
+    justifyContent:'space-between',
+    paddingBottom: 10
   },
 
 })

@@ -7,32 +7,35 @@ import { Ip } from "../Ip";
 
 export default function OrderPage2({ route }) {
 
+  const navigation = useNavigation();
+
   const [date, setDate] = useState(null);
   const { params } = useRoute();
   let item = params;
 
   const { order } = route.params;
   const [rDate, setRDate] = useState();
-
-  const navigation = useNavigation();
-
+  console.log(order)
+  
   useEffect(() => {
     let today = new Date();
     let date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
     setDate(date);
   }, []);
 
-  const [{ placedDate, productList, requiredDate, siteId, totalPrice }] = order;//destructure order object
+  const [{ placedDate, productList, requiredDate, siteId,siteName, totalPrice }] = order;//destructure order object
 
   const transformedOrder = {
     placedDate,
     requiredDate,
     totalPrice,
-    productList: productList.map(({ product, price, qnty, supplier }) => ({
+    siteName,
+    productList: productList.map(({ product, price, qnty, supplier, supplierName }) => ({
       product: product,
       price,
       qnty: qnty,
-      supplier: supplier
+      supplier: supplier,
+      supplierName: supplierName
     }))
   };
 
@@ -40,6 +43,7 @@ export default function OrderPage2({ route }) {
     axios.post(`http://${Ip}:8072/order/${siteId}`, transformedOrder).then((response) => {
       console.log(response.data)
       Alert.alert("Order placed")
+      navigation.navigate("Orders")
     }).catch((err) => {
       Alert.alert("Error with place order")
       console.log(err)
@@ -79,7 +83,7 @@ export default function OrderPage2({ route }) {
               ))}
               <Text style={styles.order}>{`Placed date : ${orderItem.placedDate}`}</Text>
               <Text style={styles.order}>{`Required Date: ${rDate}`}</Text>
-              <Text style={styles.order}>{`Site Name:  ${orderItem.site}`}</Text>
+              <Text style={styles.order}>{`Site Name:  ${orderItem.siteName}`}</Text>
               <Text style={styles.total}>{`Order Cost:  Rs. ${orderItem.totalPrice}.00`}</Text>
             </View>
           ))}

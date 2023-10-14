@@ -91,7 +91,7 @@ export default function PlaceOrder() {
   const handleOrder = () => {
     const calculatedTotal = calculateTotal(prods);
     const newOrder = {
-      site: siteInfo.value,
+      siteName: siteInfo.value,
       siteId: siteInfo.key,
       placedDate: date,
       requiredDate,
@@ -141,12 +141,9 @@ export default function PlaceOrder() {
     const selectedProduct = supList.find((product) => product.value === val);
     if (selectedProduct) {
       const supplierName = selectedProduct.value.split(' Rs. ')[0];
-
       const priceMatch = selectedProduct.value.match(/Rs\. (\d+\.\d+)/);
       const selectedPrice = priceMatch ? parseFloat(priceMatch[1]) : 0;
-
       const supplierId = selectedProduct.label;
-
       setSupplier({ name: supplierName, id: supplierId });
       setPrice(selectedPrice);
     }
