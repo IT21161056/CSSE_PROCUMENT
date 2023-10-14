@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios';
-import { Button, Grid, IconButton, InputAdornment, TextField, Typography, Link } from '@mui/material'
+import { Link } from 'react-router-dom';
+import { Button, Grid, IconButton, InputAdornment, TextField, Typography } from '@mui/material'
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -12,14 +13,46 @@ import SearchIcon from '@mui/icons-material/Search';
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import {saveAs} from 'file-saver';
+import { createTheme } from '@mui/material/styles';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
 
 const SupplierList = () => {
 
     const [suppliers, setSuppliers] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
+    const [isLoading, setIsLoading] = React.useState(false);
+    const [selectedSupplierProduct, setSelectedSupplierProduct] = useState(null); 
+    const [selectedSupplierOrder, setSelectedSupplierOrder] = useState(null); 
 
     const suppliersArray  = suppliers;
     console.log(suppliersArray);
+
+    // const theme = createTheme({
+    //   palette: {
+    //     primary: {
+    //       main: '#FFA500', // Your primary color here
+    //     },
+    //   },
+    // });
+
+    const openModalProduct = (productList) => {
+        setSelectedSupplierProduct(productList);
+        console.log(productList);
+    };
+    
+    const closeModalProduct = () => {
+        setSelectedSupplierProduct(null);
+    };
+
+    const openModalOrder = (orderList) => {
+        setSelectedSupplierOrder(orderList);
+        console.log(orderList);
+    };
+
+    const closeModalOrder = () => {
+        setSelectedSupplierOrder(null);
+    };
 
     useEffect(() => {
    
@@ -27,8 +60,9 @@ const SupplierList = () => {
         axios
             .get('http://localhost:8072/supplier/all')
             .then(( response ) => {
-            console.log(response.data)
-            setSuppliers(response.data);
+                setIsLoading(false);
+                console.log(response.data)
+                setSuppliers(response.data);
             }).catch(( error ) => {
             alert("An error occures when fecthing supplier data!!");
             console.log(error);
@@ -36,6 +70,20 @@ const SupplierList = () => {
         }
         fetchSupplierData();
     }, [])
+
+    const deleteSupplier = async ( supplierId ) => {
+        axios
+        .delete(`http://localhost:8072/supplier/deleteSupplier/${supplierId}`)
+        .then(() => {
+            setIsLoading(false);
+            const newSupplier =  suppliers.filter(( item ) => item._id != supplierId);
+            setSuppliers(newSupplier);
+            alert("Supplier deleted successfully!!");
+        }).catch(( error ) => {
+            console.log(`deletion supplie Id ${supplierId}`);
+            alert( error );
+        });
+    }
 
     const filterSuppliers = suppliers.filter(( item ) => {
         const { supplierName, email } = item;
@@ -59,8 +107,75 @@ const SupplierList = () => {
         })
     }
 
+    const renderProductTable = () => {
+        if (selectedSupplierProduct) {
+        return (
+            <Dialog open={Boolean(selectedSupplierProduct)} onClose={closeModalProduct}>
+            <DialogContent>
+                <TableContainer>
+                <Table>
+                    <TableHead sx={{backgroundColor: '#FFA500'}}>
+                    <TableRow>
+                        <TableCell>Product Name</TableCell>
+                        <TableCell>Price</TableCell>
+                        <TableCell>Quantity</TableCell>
+                    </TableRow>
+                    </TableHead>
+                    <TableBody>
+                    {selectedSupplierProduct.map(( product, index) => (
+                        <TableRow key={ index }>
+                            <TableCell>{product.name}</TableCell>
+                            <TableCell>{product.price}</TableCell>
+                            <TableCell>{product.qty}</TableCell>
+                        </TableRow>
+                    ))}
+                    </TableBody>
+                </Table>
+                </TableContainer>
+            </DialogContent>
+            </Dialog>
+        );
+    }
+    }
+
+    const renderOrderTable = () => {
+    if (selectedSupplierOrder) {
+      return (
+        <Dialog open={Boolean(selectedSupplierOrder)} onClose={closeModalOrder}>
+          <DialogContent>
+            <TableContainer>
+              <Table>
+                <TableHead sx={{backgroundColor: '#FFA500'}}>
+                  <TableRow>
+                    <TableCell>Product Name</TableCell>
+                    <TableCell>Site</TableCell>
+                    <TableCell>Quantity</TableCell>
+                    <TableCell>Required Date</TableCell>
+                    <TableCell>Status</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {selectedSupplierOrder.map(( product, index ) => (
+                    <TableRow key={ index }>
+                      <TableCell>{product.product}</TableCell>
+                      <TableCell>{product.site.siteName}</TableCell>
+                      <TableCell>{product.quantity}</TableCell>
+                      <TableCell>{product.requiredDate}</TableCell>
+                      <TableCell>{product.status}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </DialogContent>
+        </Dialog>
+      );
+    }
+  };
+
 
   return (
+    <>
     <Grid container spacing={2} sx={{ alignItems: 'flex-start', marginTop: '1rem'}}>
         <Grid item xs={12} sm={6}  sx={{ textAlign: 'center'}}>
             <Typography
@@ -81,9 +196,11 @@ const SupplierList = () => {
                 Generate Report
             </Button>
         </Grid>
+        
             <TextField
                 label= 'Search'
                 variant='outlined'
+                fullWidth
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 sx={{
@@ -100,26 +217,20 @@ const SupplierList = () => {
                     )
                 }}
             />
-
-        <TableContainer sx={{ 
-                              maxHeight: '70vh', 
-                              paddingLeft: '1rem', 
-                              margin: '1rem',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              display: 'flex',
-                            }}
-        >
+            
+        </Grid>
+        <TableContainer sx={{ maxHeight: '70vh', paddingRight: 1, paddingLeft: 1, marginTop: 1}}>
+                <Paper sx={{ width: '100%'}}>
                 <Table>
-                    <TableHead sx={{backgroundColor: '#FF9933', zIndex: 1, position: 'sticky', top: 0}}>
+                    <TableHead sx={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#FFA500' }}>
                         <TableRow>
-                            <TableCell>Supplier Name</TableCell>
-                            <TableCell>E-mail</TableCell>
-                            <TableCell>Location</TableCell>
-                            <TableCell>Contact Number</TableCell>
-                            <TableCell>Products</TableCell>
-                            <TableCell>Orders</TableCell>
-                            <TableCell>Action</TableCell>
+                            <TableCell sx={{minWidth: 150}}>Supplier Name</TableCell>
+                            <TableCell sx={{minWidth: 150}}>E-mail</TableCell>
+                            <TableCell sx={{minWidth: 150}}>Location</TableCell>
+                            <TableCell sx={{minWidth: 130}}>Contact Number</TableCell>
+                            <TableCell sx={{minWidth: 80}}>Products</TableCell>
+                            <TableCell sx={{minWidth: 80}}>Orders</TableCell>
+                            <TableCell sx={{minWidth: 60}}>Action</TableCell>
                         </TableRow>
                     </TableHead>
 
@@ -136,6 +247,7 @@ const SupplierList = () => {
                                     variant='outlined'
                                     size='small'
                                     color='warning'
+                                    onClick={() => openModalProduct(item.productList)}
                                 >
                                     View More
                                 </Button>
@@ -145,22 +257,25 @@ const SupplierList = () => {
                                     variant='outlined'
                                     size='small'
                                     color='warning'
+                                    onClick={() => openModalOrder(item.orderList)}
                                 >
                                     View More
                                 </Button>
                             </TableCell>
                             <TableCell>
-                                <IconButton sx={{ backgroundColor: "primary" }}>
-                                    <Link
-                                        to={`/dashboard/updateSupplier/${item._id}`}
-                                        state={{ orderData: item }}
-                                    ></Link>
-                                    <EditNoteIcon/>
-                                </IconButton>
                                 <IconButton>
-                                    <DeleteForeverIcon
-                                        color='error'
-                                    />
+                                    <Link    
+                                        to={`/dashboard/updateSupplier/${item._id}`}
+                                        state={{ supplierData: item }}
+                                    >
+                                        <EditNoteIcon/>
+                                    </Link>
+                                </IconButton>
+                                <IconButton
+                                    color='error'
+                                    children={<DeleteForeverIcon/>}
+                                    onClick={() => deleteSupplier(item._id)}
+                                >                      
                                 </IconButton>
                             </TableCell>
                         </TableRow>
@@ -169,8 +284,12 @@ const SupplierList = () => {
 
                     </TableBody>
                 </Table>
+            </Paper>
         </TableContainer>
-    </Grid>
+    <Grid/>
+    {renderProductTable()}
+    {renderOrderTable()}
+    </>
   );
 }
 

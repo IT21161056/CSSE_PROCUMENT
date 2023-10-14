@@ -6,12 +6,16 @@ import Container from "@mui/material/Container";
 // import { TextareaAutosize } from '@mui/base/TextareaAutosize';
 import Textarea from '@mui/joy/Textarea';
 import { createTheme } from '@mui/material/styles';
+import IconButton from "@mui/material/IconButton";
+import AddIcon from "@mui/icons-material/Add";
+
 
 const SupplierReg = () => {
 
   const defaultTheme = createTheme();
   const navigate = useNavigate();
   const [isSubmiting, setIsSubmiting] = useState(false);
+  
 
   const theme = createTheme({
     palette: {
@@ -25,18 +29,36 @@ const SupplierReg = () => {
     email: "",
     loction: "",
     contactNumber: "",
-    addedDate: "",
-    productList: "",
+    productList: [
+      { name: "", price: "", qty: ""}
+    ],
   });
 
   console.log(supplierDetails);
 
-  function onChange( event) {
+  // function onChange( event) {
+  //   const { name, value } = event.target;
+
+  //   setSupplierDetails(( prevData ) => ({
+  //     // ...prevData,
+  //     // [ name ] : value
+  //   }))
+  // }
+
+  function onChange(event, index) {
     const { name, value } = event.target;
-    setSupplierDetails(( prevData ) => ({
+    setSupplierDetails((prevData) => {
+      const updatedProducts = [...prevData.productList];
+      updatedProducts[index] = { ...updatedProducts[index], [name]: value };
+      return { ...prevData, productList: updatedProducts };
+    });
+  }
+
+  function addProductField() {
+    setSupplierDetails((prevData) => ({
       ...prevData,
-      [ name ] : value
-    }))
+      productList: [...prevData.productList, { name: "", price: "", qty: "" }],
+    }));
   }
 
   const handleSubmit = async ( event ) => {
@@ -45,14 +67,15 @@ const SupplierReg = () => {
     axios
       .post(`http://localhost:8072/supplier/add`, supplierDetails)
       .then(() => {
-        alert('Registered Succefully')
+        alert('Supplier added successfully!!')
         setSupplierDetails({
           supplierName: "",
           email: "",
           location: "",
           contactNumber: "",
-          addedDate:"",
-          productList: "",
+          productList: [
+            { name: "", price: "", qty: ""}
+          ],
         })
       }).catch(( error ) => {
         if ( error.response) {
@@ -70,27 +93,34 @@ const SupplierReg = () => {
   return (
 
       <ThemeProvider theme={theme}>
+      <Box
+      sx={{
+        display: "flex",
+        minHeight: "100vh",
+        backgroundColor: 'whitesmoke',
+        alignItems: "center", // Center the content vertically
+      }}
+    >
       <Container
       maxWidth="md"
       sx={{
         display: "flex",
         alignItems: "center",
-        height: "90vh",
+        height: "100%",
       }}
     >
-            <Box
+      <Box
         sx={{
           display: "flex",
-          backgroundColor: '#FEFEFE',
+          backgroundColor: 'white',
+          boxShadow: "8px 8px 8px rgba(0, 0, 0, 0.1)",
+          borderRadius: "4px",
           flexDirection: "column",
           alignItems: "center",
-          borderRadius: 15,
-          borderColor: '#ED960B',
-          borderWidth: '1rem',
-          pt: 10, pl: 10, pr: 10, pb: 10,
+          p: 5,
         }}
       >
-        <Typography variant="h4" mb={8}>
+        <Typography variant="h4" mb={4}>
           Add Suppliers
         </Typography>
 
@@ -105,9 +135,12 @@ const SupplierReg = () => {
                 id="supplierName"
                 label="Full-Name"
                 autoFocus
-                onChange={ ( event ) => {
-                  setSupplierDetails( event.target.value);
-                }}     
+                onChange={( event ) => 
+                  setSupplierDetails(( prev ) => ({
+                    ...prev,
+                    supplierName: event.target.value
+                  }))
+                }
               />
             </Grid>
             <Grid item xs={12}>
@@ -120,9 +153,12 @@ const SupplierReg = () => {
                 id="email"
                 label="E-mail"
                 autoFocus
-                onChange={ ( event ) => {
-                  setSupplierDetails( event.target.value );
-                }}            
+                onChange={( event ) => 
+                  setSupplierDetails(( prev ) => ({
+                    ...prev,
+                    email: event.target.value
+                  }))
+                }        
               />
             </Grid>
             <Grid item xs={12}>
@@ -134,9 +170,12 @@ const SupplierReg = () => {
                 id="location"
                 label="Location"
                 autoFocus
-                onChange={ ( event ) => {
-                  setSupplierDetails( event.target.value );
-                }}             
+                onChange={( event ) => 
+                  setSupplierDetails(( prev ) => ({
+                    ...prev,
+                    location: event.target.value
+                  }))
+                }            
               />
             </Grid>
             <Grid item xs={12}>
@@ -148,32 +187,67 @@ const SupplierReg = () => {
                 id="contactNumber"
                 label="Contact Number"
                 autoFocus
-                onChange={ ( event ) => {
-                  setSupplierDetails( event.target.value );
-                }}            
+                onChange={( event ) => 
+                  setSupplierDetails(( prev ) => ({
+                    ...prev,
+                    contactNumber: event.target.value
+                  }))
+                }       
               />
             </Grid>
-            <Grid item xs={12}>
-              <TextField
-                name="productList"
-                required
-                fullWidth
-                size="small"
-                id="productList"
-                label="Add Products"
-                autoFocus
-                onChange={ ( event ) => {
-                  setSupplierDetails( event.target.value );
-                }}            
-              />
+            <Grid item xs={12}>          
+              {supplierDetails.productList.map((product, index) => (
+                <div key={index}>
+                  <TextField
+                  sx={{mb: 1, mt: 1}}
+                    name="name"
+                    required
+                    fullWidth
+                    size="small"
+                    label="Product Name"
+                    value={product.name}
+                    onChange={(event) => onChange(event, index)}
+                  />
+                  <TextField
+                  sx={{mb: 1, mt: 1}}
+                    type="number"
+                    name="price"
+                    required
+                    fullWidth
+                    size="small"
+                    label="Product Price"
+                    value={product.price}
+                    onChange={(event) => onChange(event, index)}
+                  />
+                  <TextField
+                    type="number"
+                    name="qty"
+                    required
+                    fullWidth
+                    size="small"
+                    label="Product quantity"
+                    value={product.qty}
+                    onChange={(event) => onChange(event, index)}
+                  />
+                </div>
+              ))}
+
+              <IconButton
+                color="white"             
+                onClick={addProductField}
+                sx={{ mt: 2, backgroundColor: 'orange'}}
+              >
+                <AddIcon />
+              </IconButton>
+
             </Grid>
           </Grid>
           <Button
             type="button"
             variant="contained"
             color="warning"
-            onClick={() => navigate("/")}
-            sx={{ mt: 3, width: '50%', borderRadius: '1rem', padding:'0.5rem'}}
+            onClick={() => navigate("/dashboard")}
+            sx={{ mt: 3, mr: '8rem', width: '40%', borderRadius: '1rem', padding:'0.5rem'}}
           >
               Cancel Process
           </Button>
@@ -182,13 +256,14 @@ const SupplierReg = () => {
             variant="contained"
             color="warning"
             // disabled={isSubmiting}
-            sx={{ mt: 3, width: '50%', borderRadius: '1rem', padding:'0.5rem' }}
+            sx={{ mt: 3, width: '40%', borderRadius: '1rem', padding:'0.5rem' }}
           >
             Add Supplier
           </Button>          
         </form> 
       </Box>
     </Container>
+    </Box>
     </ThemeProvider>
   )
 }

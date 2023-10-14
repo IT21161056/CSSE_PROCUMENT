@@ -1,8 +1,11 @@
 import React from 'react'
+import p1 from '../asset/p1.jpg'
 
 const DashBoard = () => {
+
+
   return (
-    <div>DashBoard</div>
+    <h1>DashBoard</h1>
   )
 }
 

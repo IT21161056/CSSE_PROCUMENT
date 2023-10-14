@@ -228,12 +228,13 @@ const updateSupplierDetails = async ( request, response ) => {
     location,
     contactNumber,
     productList,
-    orderList
+    orderList,
+    _id
   } = request.body;
 
   console.log(request.body);
 
-  if( !supplierName || !email || !contactNumber || !location || !productList || !orderList) {
+  if( !supplierName || !location || !email || !contactNumber || !productList || !orderList) {
     return response.status(400).json({ message: 'All fields are required'});
   }
 
@@ -245,8 +246,8 @@ const updateSupplierDetails = async ( request, response ) => {
   }
 
   supplier.supplierName = supplierName;
-  supplier.location = location;
   supplier.email = email;
+  supplier.location = location;
   supplier.contactNumber = contactNumber;
   supplier.productList = productList;
   supplier.orderList = orderList;
@@ -257,16 +258,19 @@ const updateSupplierDetails = async ( request, response ) => {
 
 const deleteSupplier = async ( request, response ) => {
   try{
-    const id = request.params.id;
+    const supplierId = request.params.id;
+    console.log("deletion id >>>"+supplierId);
 
-    await Supplier.findByIdAndDelete( id ) 
+    await Supplier.findByIdAndDelete( supplierId ) 
     .then(() => {
       response.status(200).json({ message: 'Order Deleted'});
     }).catch(( error ) => {
 
       //confirm data
-      if( !id ) 
+      if( !supplierId ) 
         return response.status(400).json({ message: 'Order not found!!'})
+      if( !Supplier)
+        return response.status(400).json({ message: "Supplier not found" });
       else
         response.json({ message: 'Error with delete item ', error: error.message});
       
@@ -278,6 +282,7 @@ const deleteSupplier = async ( request, response ) => {
 
 module.exports = {
   addNewSupplier,
+  getSingleSupplier,
   getSupplierList,
   loginSupplier,
   registerSupplier,

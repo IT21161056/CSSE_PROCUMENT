@@ -3,6 +3,7 @@ const router = express.Router();
 
 const {
   addNewSupplier,
+  getSingleSupplier,
   getSupplierList,
   loginSupplier,
   registerSupplier,
@@ -14,6 +15,7 @@ const {
 } = require("../controllers/supplier.controller");
 
 router.post("/add", addNewSupplier)
+router.get("/singleSupplier/:id", getSingleSupplier);
 router.post("/supplierRegister", registerSupplier);
 router.post("/supplierLogin", loginSupplier);
 router.get("/all", getSupplierList);
