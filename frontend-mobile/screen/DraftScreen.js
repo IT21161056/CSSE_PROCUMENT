@@ -3,27 +3,43 @@ import React, { useEffect, useState } from "react";
 import { View, Text, Alert, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { Ip } from "../Ip";
 import Icon from "react-native-vector-icons/Entypo";
+import { useNavigation } from "@react-navigation/native";
 
 export default function DraftScreen() {
 
-  // const [orderList, setOrderList] = useState([]);
+  const [orderList, setOrderList] = useState([]);
+  const navigation = useNavigation()
 
-  // const sendRequest = () => {
-  //   axios.get(`http://${Ip}:8072/order/`,).then((response) => {
-  //     setOrderList(response.data)
-  //   }).catch((err) => {
-  //     Alert.alert("Error with fetching Order List")
-  //     console.log(err)
-  //   })
-  // }
+  const sendRequest = async () => {
+    try {
+      const response = await axios.get(`http://${Ip}:8072/order/`);
+      return response.data;
+    } catch (error) {
+      Alert.alert("Error with fetching Order List");
+      console.error(error);
+      return null;  // Return null if there's an error
+    }
+  }
 
-  // useEffect(() => {
-  //   sendRequest();
-  // }, [])//send request once to backend with a empty dependency array
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await sendRequest();
+      if (data) {
+        setOrderList(data);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const goToUpdate = (item) => () => {
+    navigation.navigate("UpdateOrder", { orderId: item._id });
+  }
+
 
   return (
     <View style={styles.container}>
-      {/* <Text style={styles.OrderScreen}>Order List</Text>
+      <Text style={styles.OrderScreen}>Draft Orders</Text>
 
       <ScrollView showsVerticalScrollIndicator={false}>
         {orderList.map((orderItem, index) => (
@@ -49,14 +65,14 @@ export default function DraftScreen() {
               <Text >{`Site Name: ${orderItem.siteName}`}</Text>
               <Text style={styles.total}>{`Order Cost:  Rs. ${orderItem.totalPrice}.00`}</Text>
               <View style={styles.ad}>
-                <TouchableOpacity style={styles.ad1}>
-                  <Icon name="edit"  style={styles.ad2} size={25} color="#4F8EF7" />
+                <TouchableOpacity style={styles.ad1} onPress={goToUpdate(orderItem)}>
+                  <Icon name="edit" style={styles.ad2} size={25} color="#4F8EF7" />
                 </TouchableOpacity>
               </View>
             </View>
           </View>
         ))}
-      </ScrollView> */}
+      </ScrollView>
     </View>
   );
 
@@ -135,15 +151,15 @@ const styles = StyleSheet.create({
   },
   ad: {
     marginLeft: 250,
-    backgroundColor:'gray',
-    borderRadius:100,
-    justifyContent:'center',
-    alignItems:'center',
-    width:40,
-    height:40
+    backgroundColor: 'gray',
+    borderRadius: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 40,
+    height: 40
   },
-  ad2:{
-    color:'black',
+  ad2: {
+    color: 'black',
   }
 
 })

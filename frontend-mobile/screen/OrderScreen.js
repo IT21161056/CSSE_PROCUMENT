@@ -1,12 +1,15 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { View, Text, Alert, StyleSheet, ScrollView } from "react-native";
+import { View, Text, Alert, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import Icon from "react-native-vector-icons/Entypo";
 import { Ip } from "../Ip";
+import { useNavigation } from "@react-navigation/native";
 
 
 export default function OrderScreen() {
 
   const [orderList, setOrderList] = useState([]);
+  const navigation = useNavigation();
 
   const sendRequest = () => {
     axios.get(`http://${Ip}:8072/order/`,).then((response) => {
@@ -21,6 +24,7 @@ export default function OrderScreen() {
     sendRequest();
   }, [])//send request once to backend with a empty dependency array
 
+ 
   return (
     <View style={styles.container}>
       <Text style={styles.OrderScreen}>Order List</Text>
@@ -73,12 +77,24 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 18,
     padding: 25,
-    marginLeft:20,
-    marginRight:20
- 
+    marginLeft: 20,
+    marginRight: 20
+
   },
   mainOrder: {
     marginLeft: 10
+  },
+  ad: {
+    marginLeft: 250,
+    backgroundColor: 'gray',
+    borderRadius: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 40,
+    height: 40
+  },
+  ad2: {
+    color: 'black',
   },
   green: {
     backgroundColor: '#00e600',
@@ -110,14 +126,14 @@ const styles = StyleSheet.create({
   },
   tableRow1: {
     flexDirection: 'row',
-    justifyContent:'space-between',
+    justifyContent: 'space-between',
     alignItems: 'center',
     padding: 10,
     borderColor: '#ccc',
   },
   cell: {
     display: 'flex',
-    justifyContent:'space-between'
+    justifyContent: 'space-between'
   },
   orderId: {
     display: 'flex',
@@ -125,9 +141,9 @@ const styles = StyleSheet.create({
   },
   tableRow: {
     flexDirection: 'row',
-    justifyContent:'space-around',
+    justifyContent: 'space-around',
     paddingBottom: 10,
-  
+
   },
 
 })
