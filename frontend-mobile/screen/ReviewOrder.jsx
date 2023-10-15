@@ -24,11 +24,11 @@ const ReviewOrder = ({ route }) => {
   const [visible, setVisible] = React.useState(false);
   const [review, setReview] = useState("");
 
-  const [subOrderList, setSubOrders] = useState(itemData.orderList);
+  const [subOrderList, setSubOrders] = useState(itemData.productList);
 
   const getSubOrderId = (id) => {
     const getSubOrderList = subOrderList.map((ob) => {
-      if (ob.id === id) {
+      if (ob._id === id) {
         return {
           ...ob,
           isComplete: true,
@@ -42,18 +42,16 @@ const ReviewOrder = ({ route }) => {
         };
       }
     });
-
     setSubOrders(getSubOrderList);
   };
 
-  const submit = () => {
+  const submit = async () => {
     const reviewedOrder = {
       ...itemData,
       orderList: [...subOrderList],
       review: review,
     };
-
-    axios
+    await axios
       .post("http://192.168.1.101:8072/orderReview", reviewedOrder)
       .then((res) => {})
       .catch((err) => {});
@@ -69,22 +67,22 @@ const ReviewOrder = ({ route }) => {
           <Text style={{ ...styles.thead }}>Complete status</Text>
         </View>
         <ScrollView scrollEnabled={true} style={{ height: 300 }}>
-          {itemData.orderList.map((order, index) => (
+          {itemData.productList.map((order, index) => (
             <TableRow key={index} order={order} getSubOrderId={getSubOrderId} />
           ))}
         </ScrollView>
         <View style={styles.infoSection}>
           <View style={styles.singleRow}>
             <Text style={styles.label}>Place date:</Text>
-            <Text style={styles.data}>{"2023/10/10"}</Text>
+            <Text style={styles.data}>{itemData.placedDate}</Text>
           </View>
           <View style={styles.singleRow}>
             <Text style={styles.label}>Order required:</Text>
-            <Text style={styles.data}>{"2023/10/20"}</Text>
+            <Text style={styles.data}>{itemData.requiredDate}</Text>
           </View>
           <View style={styles.singleRow}>
             <Text style={styles.label}>Site name:</Text>
-            <Text style={styles.data}>{"Malabe"} </Text>
+            <Text style={styles.data}>{itemData.site} </Text>
           </View>
         </View>
         <View style={styles.btnContainer}>

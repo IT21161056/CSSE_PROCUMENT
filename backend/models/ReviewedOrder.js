@@ -7,9 +7,9 @@ const ReviewedSchema = new Schema({
     {
       subOrderId: { type: String },
       isComplete: { type: Boolean },
-      item: { type: String },
+      product: { type: String },
       price: { type: Number },
-      quantity: { type: Number },
+      qnty: { type: Number },
       supplier: { type: mongoose.Schema.Types.ObjectId, ref: "Supplier" },
     },
   ],
