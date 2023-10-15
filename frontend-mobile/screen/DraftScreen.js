@@ -6,24 +6,24 @@ import Icon from "react-native-vector-icons/Entypo";
 
 export default function DraftScreen() {
 
-  const [orderList, setOrderList] = useState([]);
+  // const [orderList, setOrderList] = useState([]);
 
-  const sendRequest = () => {
-    axios.get(`http://${Ip}:8072/order/`,).then((response) => {
-      setOrderList(response.data)
-    }).catch((err) => {
-      Alert.alert("Error with fetching Order List")
-      console.log(err)
-    })
-  }
+  // const sendRequest = () => {
+  //   axios.get(`http://${Ip}:8072/order/`,).then((response) => {
+  //     setOrderList(response.data)
+  //   }).catch((err) => {
+  //     Alert.alert("Error with fetching Order List")
+  //     console.log(err)
+  //   })
+  // }
 
-  useEffect(() => {
-    sendRequest();
-  }, [])//send request once to backend with a empty dependency array
+  // useEffect(() => {
+  //   sendRequest();
+  // }, [])//send request once to backend with a empty dependency array
 
   return (
     <View style={styles.container}>
-      <Text style={styles.OrderScreen}>Order List</Text>
+      {/* <Text style={styles.OrderScreen}>Order List</Text>
 
       <ScrollView showsVerticalScrollIndicator={false}>
         {orderList.map((orderItem, index) => (
@@ -56,7 +56,7 @@ export default function DraftScreen() {
             </View>
           </View>
         ))}
-      </ScrollView>
+      </ScrollView> */}
     </View>
   );
 
