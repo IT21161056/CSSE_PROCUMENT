@@ -19,7 +19,7 @@ export default function PlaceOrder() {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [siteInfo, setSiteInfo] = useState({ key: value, name: '' });
   const [order, setOrder] = useState([])
-  const [site, setSite] = useState();
+
   const [requiredDate, setSelectedDate] = useState('required Date')
   const [supplier, setSupplier] = useState();
   const [product, setProduct] = useState();
@@ -49,7 +49,7 @@ export default function PlaceOrder() {
     }));
   });
 
-
+  //fetching site list
   const fetchSiteList = async () => {
     try {
       const res = await axios.get(`http://${Ip}:8072/site/`)
@@ -61,6 +61,7 @@ export default function PlaceOrder() {
     }
   };
 
+  //fetch product list
   const fetchProductList = async () => {
     try {
       const res = await axios.get(`http://${Ip}:8072/product/`)
@@ -90,21 +91,24 @@ export default function PlaceOrder() {
 
   const handleOrder = () => {
     const calculatedTotal = calculateTotal(prods);
-    const newOrder = {
-      siteName: siteInfo.value,
-      siteId: siteInfo.key,
-      placedDate: date,
-      requiredDate,
-      productList: prods,
-      totalPrice: calculatedTotal
-    };
-    setTotal(calculatedTotal);
-    setOrder([...order, newOrder]);
-    setSupplier("");
-    setProduct("");
-    setQnty("");
-    navigation.navigate('Place2', { order: [...order, newOrder] });
-
+    if (siteInfo && requiredDate && prods && prods.length > 0) {
+      const newOrder = {
+        siteName: siteInfo.value,
+        siteId: siteInfo.key,
+        placedDate: date,
+        requiredDate,
+        productList: prods,
+        totalPrice: calculatedTotal
+      };
+      setTotal(calculatedTotal);
+      setOrder([...order, newOrder]);
+      setSupplier("");
+      setProduct("");
+      setQnty("");
+      navigation.navigate('Place2', { order: [...order, newOrder] });
+    } else {
+      Alert.alert("All fields are required")
+    }
   };
 
 
@@ -156,7 +160,7 @@ export default function PlaceOrder() {
     setDate(date);
   }, []);
 
-  
+
   //calculate cost for the order
   const calculateTotal = (prods) => {
     let total = 0;

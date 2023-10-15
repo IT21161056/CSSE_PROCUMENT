@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, SafeAreaView, StyleSheet, AsyncStorage, TouchableOpacity, Alert } from "react-native";
+import { View, Text, SafeAreaView, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import uuid from 'react-native-uuid';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from "axios";
 import { Ip } from "../Ip";
 
@@ -15,15 +16,14 @@ export default function OrderPage2({ route }) {
 
   const { order } = route.params;
   const [rDate, setRDate] = useState();
-  console.log(order)
-  
+
   useEffect(() => {
     let today = new Date();
     let date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
     setDate(date);
   }, []);
 
-  const [{ placedDate, productList, requiredDate, siteId,siteName, totalPrice }] = order;//destructure order object
+  const [{ placedDate, productList, requiredDate, siteId, siteName, totalPrice }] = order; //destructure order object
 
   const transformedOrder = {
     placedDate,
@@ -43,12 +43,22 @@ export default function OrderPage2({ route }) {
     axios.post(`http://${Ip}:8072/order/${siteId}`, transformedOrder).then((response) => {
       console.log(response.data)
       Alert.alert("Order placed")
-      navigation.navigate("Orders")
+      navigation.navigate("Orders", { order: null })
     }).catch((err) => {
       Alert.alert("Error with place order")
       console.log(err)
     })
   }
+
+  const handleDraft = async () => {
+    try {
+      const orderJson = JSON.stringify(transformedOrder);
+      await AsyncStorage.setItem('draftOrder', orderJson);
+      navigation.navigate('Drafts');
+    } catch (error) {
+      console.error('Error saving draft order to AsyncStorage:', error);
+    }
+  };
 
   useEffect(() => {
     if (order && order.length > 0 && order[0].productList && order[0].productList.length > 0) {
@@ -96,7 +106,7 @@ export default function OrderPage2({ route }) {
           <Text style={{ fontSize: 19, color: 'white' }} title='Confirm'>Confirm</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.draft} title="Draft" onPress={() => { navigation.navigate("Draft") }}>
+        <TouchableOpacity style={styles.draft} title="Draft" onPress={handleDraft}>
           <Text style={{ fontSize: 19, color: 'white' }} title='Draft'>Draft</Text>
         </TouchableOpacity>
       </View>

@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
   green: {
     backgroundColor: '#00e600',
     position: 'absolute',
-    left: 170,
+    left: 220,
     bottom: 1,
     borderRadius: 8,
     padding: 5,
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
   yellow: {
     backgroundColor: '#ffb366',
     position: 'absolute',
-    left: 170,
+    left: 220,
     bottom: 1,
     borderRadius: 8,
     padding: 5,
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     marginLeft: 15
   },
   txt: {
-    fontSize: 18
+    fontSize: 18,
   },
   tableRow1: {
     flexDirection: 'row',
@@ -125,8 +125,9 @@ const styles = StyleSheet.create({
   },
   tableRow: {
     flexDirection: 'row',
-    justifyContent:'space-between',
-    paddingBottom: 10
+    justifyContent:'space-around',
+    paddingBottom: 10,
+  
   },
 
 })
