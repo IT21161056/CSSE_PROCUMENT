@@ -111,7 +111,7 @@ const getDeliveryListByOrderId = async (req, res) => {
 //get Order details
 const getOrderDetails = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id);
+    const order = await Order.findById(req.params.id).populate("site");
     if (!order) {
       return res.send("No order found!");
     }
@@ -125,7 +125,7 @@ const getOrderDetails = async (req, res) => {
 //get Order List
 const getOrderList = async (req, res) => {
   try {
-    const orderList = await Order.find();
+    const orderList = await Order.find().populate("site");
 
     if (!orderList) {
       return res.send("No orders!");
