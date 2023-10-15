@@ -14,7 +14,7 @@ export default function OrderCard({ item }) {
   return (
     <TouchableOpacity onPress={reviewOrder} style={styles.container}>
       <View style={styles.orderCard}>
-        <View style={styles.divideToThree}>
+        <View style={{ width: "20%" }}>
           <Checkbox
             status={checked ? "checked" : "unchecked"}
             onPress={() => {
@@ -23,13 +23,14 @@ export default function OrderCard({ item }) {
             color="#111212"
           />
         </View>
-        <View style={{ ...styles.leftHalf, ...styles.divideToThree }}>
+        <View style={{ ...styles.leftHalf, width: "60%" }}>
           <View style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <Text style={{ fontSize: 20 }}>Order 1</Text>
-            <Text>{item.date}</Text>
+            <Text>Place Date :{item.placedDate}</Text>
+            <Text>Place Date :{item.requiredDate}</Text>
           </View>
         </View>
-        <View style={{ ...styles.rightHalf, ...styles.divideToThree }}>
+        <View style={{ ...styles.rightHalf, width: "20%" }}>
           <Text
             style={{
               ...styles.approvedStatus(item.status),
@@ -40,7 +41,7 @@ export default function OrderCard({ item }) {
           >
             {item.status}
           </Text>
-          <Text>{item.totalCost}</Text>
+          <Text>{item.totalPrice}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -86,8 +87,4 @@ const styles = StyleSheet.create({
     color: "white",
     textTransform: "uppercase",
   }),
-  divideToThree: {
-    flexGrow: 1,
-    width: "33%",
-  },
 });
