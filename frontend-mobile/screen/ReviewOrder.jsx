@@ -17,6 +17,7 @@ import {
 } from "react-native-paper";
 import TableRow from "../components/TableRow";
 import axios from "axios";
+import { Ip } from "../Ip";
 
 const ReviewOrder = ({ route }) => {
   const { params } = useRoute();
@@ -48,11 +49,12 @@ const ReviewOrder = ({ route }) => {
   const submit = async () => {
     const reviewedOrder = {
       ...itemData,
-      orderList: [...subOrderList],
+      productList: [...subOrderList],
       review: review,
     };
+
     await axios
-      .post("http://192.168.1.101:8072/orderReview", reviewedOrder)
+      .post(`http://${Ip}:8072/orderReview/add`, reviewedOrder)
       .then((res) => {})
       .catch((err) => {});
   };
@@ -82,7 +84,7 @@ const ReviewOrder = ({ route }) => {
           </View>
           <View style={styles.singleRow}>
             <Text style={styles.label}>Site name:</Text>
-            <Text style={styles.data}>{itemData.site} </Text>
+            <Text style={styles.data}>{itemData.site.siteName} </Text>
           </View>
         </View>
         <View style={styles.btnContainer}>
@@ -167,7 +169,9 @@ const styles = StyleSheet.create({
   modal: { backgroundColor: "white", padding: 20 },
   infoSection: {
     marginTop: 20,
+    padding: 30,
     width: "100%",
+    backgroundColor: "white",
   },
   singleRow: {
     display: "flex",

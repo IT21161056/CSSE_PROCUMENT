@@ -1,16 +1,27 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, SafeAreaView, StyleSheet, View } from "react-native";
+import {
+  FlatList,
+  SafeAreaView,
+  StyleSheet,
+  Touchable,
+  TouchableOpacity,
+  View,
+  Text,
+} from "react-native";
 import OrderCard from "../components/OrderCard";
+import Icon from "react-native-vector-icons/Ionicons";
 // import { orders } from "../assets/data/db";
 import axios from "axios";
+import { Ip } from "../Ip";
+import { useNavigation } from "@react-navigation/native";
 
 export default function TrackOrder() {
   const [orders, setOrders] = useState([]);
-
+  const navigate = useNavigation();
   useEffect(() => {
     const fetch = async () => {
       await axios
-        .get("http://192.168.1.100:8072/order")
+        .get(`http://${Ip}:8072/order`)
         .then((res) => {
           console.log(res.data);
           setOrders(res.data);
@@ -20,10 +31,20 @@ export default function TrackOrder() {
     fetch();
   }, []);
 
-  console.log(orders);
+  const reviewedList = () => {
+    navigate.navigate("ReviewedOrders");
+  };
 
   return (
     <View>
+      <View style={styles.topBar}>
+        <TouchableOpacity style={styles.Btn} onPress={reviewedList}>
+          <Icon name="document-text" size={20} color="black" />
+          <Text style={{ color: "white", fontWeight: 600 }}>
+            show Reviewed orders
+          </Text>
+        </TouchableOpacity>
+      </View>
       <FlatList
         data={orders}
         renderItem={({ item }) => <OrderCard item={item} />}
@@ -39,6 +60,21 @@ const styles = StyleSheet.create({
   container: {
     alignItems: "center",
     justifyContent: "center",
+  },
+  topBar: {
+    alignItems: "center",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+  },
+  Btn: {
+    backgroundColor: "#FF9933",
+    padding: 10,
+    margin: 10,
+    borderRadius: 8,
+    display: "flex",
+    flexDirection: "row",
+    gap: 5,
   },
   login: {
     fontSize: 30,

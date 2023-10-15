@@ -25,7 +25,9 @@ export default function OrderCard({ item }) {
         </View>
         <View style={{ ...styles.leftHalf, width: "60%" }}>
           <View style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            <Text style={{ fontSize: 20 }}>Order 1</Text>
+            <Text style={{ fontSize: 20 }}>
+              Order from :{item.site.siteName}
+            </Text>
             <Text>Place Date :{item.placedDate}</Text>
             <Text>Place Date :{item.requiredDate}</Text>
           </View>

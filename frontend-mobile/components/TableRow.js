@@ -40,6 +40,7 @@ const styles = StyleSheet.create({
     width: "100%",
     display: "flex",
     flexDirection: "row",
+    backgroundColor: "white",
     // backgroundColor: "#213455",
   },
   rowData: {
