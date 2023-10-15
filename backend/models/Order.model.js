@@ -24,6 +24,9 @@ const OrderSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Site",
   },
+  siteName: {
+    type: String,
+  },
   placedDate: {
     type: String,
   },

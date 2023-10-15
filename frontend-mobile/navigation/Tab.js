@@ -9,6 +9,7 @@ import TrackOrder from "../screen/TrackOrder";
 import DraftScreen from "../screen/DraftScreen";
 import OrderPage2 from "../screen/OrderPage2";
 import ReviewOrder from "../screen/ReviewOrder";
+import UpdateOrder from "../screen/UpdateOrder"
 
 const Tabs = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -93,6 +94,11 @@ export default function Tab() {
               component={OrderScreen}
               options={{ headerShown: "false" }}
             />
+            <Stack.Screen
+              name="UpdateOrder"
+              component={UpdateOrder}
+              options={{ headerShown: "false" }}
+            />
           </Stack.Navigator>
         )}
       </Tabs.Screen>
@@ -152,6 +158,11 @@ export default function Tab() {
         {() => (
           <Stack.Navigator screenOptions={{ headerShown: "false" }}>
             <Stack.Screen name="Draft" component={DraftScreen} />
+            <Stack.Screen
+              name="UpdateOrder"
+              component={UpdateOrder}
+              options={{ headerShown: "false" }}
+            />
           </Stack.Navigator>
         )}
       </Tabs.Screen>

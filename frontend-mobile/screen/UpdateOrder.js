@@ -1,16 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Button, StyleSheet, TextInput, Alert, SafeAreaView, TouchableOpacity } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { SelectList } from 'react-native-dropdown-select-list'
 import Icon from "react-native-vector-icons/Ionicons";
 import axios from 'axios'
 import { Ip } from '../Ip'
 
-export default function PlaceOrder() {
-
+export default function UpdateOrder({ route }) {
+  const { params } = useRoute();
+  let item = params;
+  const { orderId } = route.params;
   const navigation = useNavigation();
 
+  const [updateOrder,setUpdateOrder] = useState([])
+  const [order, setOrder] = useState([]);
   const [value, setValue] = useState(null);
   const [total, setTotal] = useState(0);
   const [productList, setProductList] = useState([])
@@ -18,7 +22,6 @@ export default function PlaceOrder() {
   const [supplierlist, setSupplierList] = useState([])
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [siteInfo, setSiteInfo] = useState({ key: value, name: '' });
-  const [order, setOrder] = useState([])
 
   const [requiredDate, setSelectedDate] = useState('required Date')
   const [supplier, setSupplier] = useState();
@@ -169,80 +172,101 @@ export default function PlaceOrder() {
     });
     return total;
   };
+  
 
+  const sendRequest = async () => {
+    try {
+      const response = await axios.get(`http://${Ip}:8072/order/${orderId}`);
+      setUpdateOrder(response.data);
+    } catch (error) {
+      Alert.alert("Error with fetching Order List");
+      console.error(error);
+      return null;  // Return null if there's an error
+    }
+  }
+
+  useEffect(() => {
+    sendRequest()
+  }, [])
 
   return (
     <SafeAreaView>
-      <Text style={styles.place}>Place Order</Text>
+    <Text style={styles.place}>Place Order</Text>
 
-      <View style={styles.selectSite}>
-        <Text style={styles.selectText}>Select Site</Text>
-        <SelectList
-          setSelected={(val) => {
-            const selectedSite = sitelist.find(item => item._id === val);
-            const value = selectedSite ? selectedSite.siteName : 'Unknown Site';
-            setSiteInfo({ key: val, value });
-          }}
-          data={siteNames}
-          placeholder="Select supplier"
-          boxStyles={styles.siteBox}
+    <View style={styles.selectSite}>
+      <Text style={styles.selectText}>Select Site</Text>
+      <SelectList
+        setSelected={(val) => {
+          const selectedSite = sitelist.find(item => item._id === val);
+          const value = selectedSite ? selectedSite.siteName : 'Unknown Site';
+          setSiteInfo({ key: val, value });
+        }}
+        data={siteNames}
+        placeholder="Select supplier"
+        boxStyles={styles.siteBox}
+      />
+    </View>
+
+    <View style={styles.rdate}>
+      <TouchableOpacity onPress={() => { showDatePicker() }}>
+        <Text style={styles.rdatetxt}>Required date</Text>
+        <DateTimePickerModal
+          isVisible={isDatePickerVisible}
+          mode="date"
+          onConfirm={handleConfirm}
+          onCancel={hideDatePicker}
         />
-      </View>
+        <TextInput style={styles.input1} placeholder="date" value={requiredDate} />
+      </TouchableOpacity>
+    </View>
 
-      <View style={styles.rdate}>
-        <TouchableOpacity onPress={() => { showDatePicker() }}>
-          <Text style={styles.rdatetxt}>Required date</Text>
-          <DateTimePickerModal
-            isVisible={isDatePickerVisible}
-            mode="date"
-            onConfirm={handleConfirm}
-            onCancel={hideDatePicker}
-          />
-          <TextInput style={styles.input1} placeholder="date" value={requiredDate} />
-        </TouchableOpacity>
-      </View>
+    <View style={styles.productselect}>
+      <Text style={styles.productText}>Select product</Text>
+      <SelectList
+        setSelected={(val) => getSupplierByProduct(val)}
+        data={productNames}
+        placeholder="Select product"
+        boxStyles={styles.productBox}
+      />
+    </View>
 
-      <View style={styles.productselect}>
-        <Text style={styles.productText}>Select product</Text>
-        <SelectList
-          setSelected={(val) => getSupplierByProduct(val)}
-          data={productNames}
-          placeholder="Select product"
-          boxStyles={styles.productBox}
-        />
-      </View>
+    <View style={styles.suppplierView}>
+      <Text style={styles.supplierText}>Select supplier</Text>
+      <SelectList
+        setSelected={(val) => handleSelect(val)}
+        data={supList}
+        placeholder="Select supplier"
+        boxStyles={styles.supplierBox}
+      />
+    </View>
 
-      <View style={styles.suppplierView}>
-        <Text style={styles.supplierText}>Select supplier</Text>
-        <SelectList
-          setSelected={(val) => handleSelect(val)}
-          data={supList}
-          placeholder="Select supplier"
-          boxStyles={styles.supplierBox}
-        />
-      </View>
+    <View style={styles.qnty}>
+      <Text style={styles.qntyText}>Quantity</Text>
+      <TextInput style={styles.input} placeholder="Quantity" onChangeText={(text) => setQnty(text)} />
+    </View>
 
-      <View style={styles.qnty}>
-        <Text style={styles.qntyText}>Quantity</Text>
-        <TextInput style={styles.input} placeholder="Quantity" onChangeText={(text) => setQnty(text)} />
-      </View>
+    <View style={styles.ad}>
+      <TouchableOpacity onPress={handleProducts} style={styles.ad1}>
+        <Icon name="add" style={styles.ad2} size={32} color="#4F8EF7" />
+      </TouchableOpacity>
+      <Text style={styles.ad3}>Add more products</Text>
+    </View>
 
-      <View style={styles.ad}>
-        <TouchableOpacity onPress={handleProducts} style={styles.ad1}>
-          <Icon name="add" style={styles.ad2} size={32} color="#4F8EF7" />
-        </TouchableOpacity>
-        <Text style={styles.ad3}>Add more products</Text>
-      </View>
+    <View style={styles.rds}>
+      <Button onPress={handleOrder} style={styles.nxt} title="Next" color='#ffa366' />
+    </View>
 
-      <View style={styles.rds}>
-        <Button onPress={handleOrder} style={styles.nxt} title="Next" color='#ffa366' />
-      </View>
-
-    </SafeAreaView>
+  </SafeAreaView>
   );
+
 }
 
 const styles = StyleSheet.create({
+
+  container: {
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
   input1: {
     height: 50,
     margin: 12,
@@ -424,5 +448,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderColor: '#ffa366'
   },
+  
 
-});
+})

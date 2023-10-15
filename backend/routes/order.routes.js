@@ -16,11 +16,15 @@ const {
   closeOrderAfterDeliveryCompletedBySiteManager,
   getOrderListBySiteId,
   getOrderProductListByOrderId,
+  updateOrderBySiteManager,
+  getOrderByOrderId,
 } = require("../controllers/order.controller");
 
 // router.get("/:id", getOrderDetails);
 router.get("/", getOrderList);
 router.post("/:id", addOrderBySiteManager);
+router.put("/:id",updateOrderBySiteManager)
+router.get("/:id",getOrderByOrderId)
 // router.post("/sitemanager/confirmorder/:id", comfirmOrderBySiteManager);
 // router.post("/manager/approve/:orderid", approvedOrDisapprovedOrderByManager);
 // router.post(
