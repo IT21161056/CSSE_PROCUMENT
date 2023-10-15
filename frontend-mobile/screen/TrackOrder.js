@@ -27,7 +27,7 @@ export default function TrackOrder() {
       <FlatList
         data={orders}
         renderItem={({ item }) => <OrderCard item={item} />}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id}
         // contentContainerStyle={{ columnGap: 10 }}
         showsHorizontalScrollIndicator={false}
       />

@@ -12,19 +12,19 @@ const TableRow = ({ order, getSubOrderId }) => {
   return (
     <View style={styles.tableRow}>
       <View style={{ ...styles.rowData }}>
-        <Text>{order.item}</Text>
+        <Text>{order.product}</Text>
       </View>
       <View style={{ ...styles.rowData }}>
-        <Text>{order.supplier}</Text>
+        <Text>{order.supplierName}</Text>
       </View>
       <View style={{ ...styles.rowData }}>
-        <Text>{order.quantity}</Text>
+        <Text>{order.qnty}</Text>
       </View>
       <View style={{ ...styles.rowData }}>
         <Checkbox
           status={checked ? "checked" : "unchecked"}
           onPress={() => {
-            setData(order.id);
+            setData(order._id);
           }}
           color="#111212"
         />
