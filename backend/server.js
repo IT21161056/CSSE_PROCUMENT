@@ -30,6 +30,10 @@ app.use("/supplier", supplierRoute);
 const orderRoute = require("./routes/order.routes.js");
 app.use("/order", orderRoute);
 
+const requestRoutes = require("./routes/request.routes");
+app.use("/requestlist", requestRoutes);
+
+
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB");
   app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

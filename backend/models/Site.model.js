@@ -22,6 +22,9 @@ const SiteSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "SiteManager",
   },
+  allocatedBudget: {
+    type: String,
+  }
 });
 
 module.exports = mongoose.model("Site", SiteSchema);
