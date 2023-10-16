@@ -33,7 +33,6 @@ const SupplierList = () => {
     const [selectedSupplierOrder, setSelectedSupplierOrder] = useState(null); 
 
     const suppliersArray  = suppliers;
-    console.log(suppliersArray);
 
     const openModalProduct = (productList) => {
         setSelectedSupplierProduct(productList);
@@ -60,7 +59,6 @@ const SupplierList = () => {
             .get('http://localhost:8072/supplier/all')
             .then(( response ) => {
                 setIsLoading(false);
-                console.log(response.data)
                 setSuppliers(response.data);
             }).catch(( error ) => {
             alert("An error occures when fecthing supplier data!!");
@@ -85,7 +83,7 @@ const SupplierList = () => {
             console.log(`deletion supplie Id ${supplierId}`);
             alert( error );
         });
-    }
+    };
 
     const filterSuppliers = suppliers.filter(( item ) => {
         const { supplierName, email } = item;
@@ -99,46 +97,51 @@ const SupplierList = () => {
 
     function createAndDownLoadPdf(){
         axios.post('http://localhost:8072/orders_pdf/create-pdf', suppliersArray)
-        .then(() => axios.get('http://localhost:8072/orders_pdf/fetch-pdf', {responseType:'blob'}))
+        .then(() => axios.get('http://localhost:8072/orders_pdf/fetch-pdf', {
+            responseType:'blob'
+        })
+        )
         .then((res)=>{
-
-            console.log(res.data)
             const pdfBlob = new Blob([res.data], {type:'application/pdf'})
-
             saveAs(pdfBlob, 'Suppllier Report.pdf')
         })
+        .catch((error) => {
+            console.log('Error generating or downloading the PDF');
+            console.error(error);
+      });
     }
 
     const renderProductTable = () => {
         if (selectedSupplierProduct) {
-        return (
-            <Dialog open={Boolean(selectedSupplierProduct)} onClose={closeModalProduct}>
-            <DialogContent>
-                <TableContainer>
-                <Table>
-                    <TableHead sx={{backgroundColor: '#FFA500'}}>
-                    <TableRow>
-                        <TableCell>Product Name</TableCell>
-                        <TableCell>Price</TableCell>
-                        <TableCell>Quantity</TableCell>
-                    </TableRow>
-                    </TableHead>
-                    <TableBody>
-                    {selectedSupplierProduct.map(( product, index) => (
-                        <TableRow key={ index }>
-                            <TableCell>{product.name}</TableCell>
-                            <TableCell>{product.price}</TableCell>
-                            <TableCell>{product.qty}</TableCell>
-                        </TableRow>
-                    ))}
-                    </TableBody>
-                </Table>
-                </TableContainer>
-            </DialogContent>
-            </Dialog>
-        );
-    }
-}
+            return (
+                <Dialog open={Boolean(selectedSupplierProduct)} onClose={closeModalProduct}>
+                    <DialogContent>
+                        <TableContainer>
+                            <Table>
+                                <TableHead sx={{backgroundColor: '#FFA500'}}>
+                                    <TableRow>
+                                        <TableCell>Product Name</TableCell>
+                                        <TableCell>Price</TableCell>
+                                        <TableCell>Quantity</TableCell>
+                                    </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {selectedSupplierProduct.map(( product, index) => (
+                                            <TableRow key={ index }>
+                                                <TableCell>{product.name}</TableCell>
+                                                <TableCell>{product.price}</TableCell>
+                                                <TableCell>{product.qty}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </DialogContent>
+                    </Dialog>
+            );
+        }
+        return null;
+    };
 
     const renderOrderTable = () => {
     if (selectedSupplierOrder) {
@@ -173,7 +176,6 @@ const SupplierList = () => {
         </Dialog>
       );
     }
-    return null; // Return null if selectedSupplierOrder is null
   };
 
 
@@ -223,7 +225,7 @@ const SupplierList = () => {
             
         </Grid>
         <TableContainer sx={{ maxHeight: '70vh', paddingRight: 1, paddingLeft: 1, marginTop: 1}}>
-                <Paper sx={{ width: '100%'}}>
+            <Paper sx={{ width: '100%'}}>
                 <Table>
                     <TableHead sx={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: '#FFA500' }}>
                         <TableRow>
@@ -240,48 +242,48 @@ const SupplierList = () => {
                     <TableBody>
                     {filterSuppliers.map(( item ) => {
                         return(
-                        <TableRow key={item._id}>
-                            <TableCell>{item.supplierName}</TableCell>
-                            <TableCell>{item.email}</TableCell>
-                            <TableCell>{item.location}</TableCell>
-                            <TableCell>{item.contactNumber}</TableCell>
-                            <TableCell>
-                                <Button
-                                    variant='outlined'
-                                    size='small'
-                                    color='warning'
-                                    onClick={() => openModalProduct(item.productList)}
-                                >
-                                    View More
-                                </Button>
-                            </TableCell>
-                            <TableCell>
-                                <Button
-                                    variant='outlined'
-                                    size='small'
-                                    color='warning'
-                                    onClick={() => openModalOrder(item.orderList)}
-                                >
-                                    View More
-                                </Button>
-                            </TableCell>
-                            <TableCell>
-                                <IconButton>
-                                    <Link    
-                                        to={`/dashboard/updateSupplier/${item._id}`}
-                                        state={{ supplierData: item }}
+                            <TableRow key={item._id}>
+                                <TableCell>{item.supplierName}</TableCell>
+                                <TableCell>{item.email}</TableCell>
+                                <TableCell>{item.location}</TableCell>
+                                <TableCell>{item.contactNumber}</TableCell>
+                                <TableCell>
+                                    <Button
+                                        variant='outlined'
+                                        size='small'
+                                        color='warning'
+                                        onClick={() => openModalProduct(item.productList)}
                                     >
-                                        <EditNoteIcon/>
-                                    </Link>
-                                </IconButton>
-                                <IconButton
-                                    color='error'
-                                    children={<DeleteForeverIcon/>}
-                                    onClick={() => deleteSupplier(item._id)}
-                                >                      
-                                </IconButton>
-                            </TableCell>
-                        </TableRow>
+                                        View More
+                                    </Button>
+                                </TableCell>
+                                <TableCell>
+                                    <Button
+                                        variant='outlined'
+                                        size='small'
+                                        color='warning'
+                                        onClick={() => openModalOrder(item.orderList)}
+                                    >
+                                        View More
+                                    </Button>
+                                </TableCell>
+                                <TableCell>
+                                    <IconButton>
+                                        <Link    
+                                            to={`/dashboard/updateSupplier/${item._id}`}
+                                            state={{ supplierData: item }}
+                                        >
+                                            <EditNoteIcon/>
+                                        </Link>
+                                    </IconButton>
+                                    <IconButton
+                                        color='error'
+                                        children={<DeleteForeverIcon/>}
+                                        onClick={() => deleteSupplier(item._id)}
+                                    >                      
+                                    </IconButton>
+                                </TableCell>
+                            </TableRow>
                         );
                     })}
 
