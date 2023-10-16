@@ -7,8 +7,6 @@ const config = require("config");
 //get Supplier details by id
 const getSupplierDetailsById = async ( request, response ) => {
   try {
-    //get user details
-    //-password : dont return the pasword
     const user = await Supplier.findById(request.params.id).select("-password");
 
     response.json(user);
@@ -19,13 +17,14 @@ const getSupplierDetailsById = async ( request, response ) => {
 };
 
 //Accepted Orders or Completed Orders For Each Supplier
+
 const getAcceptedOrCompletedOrdersForEachSupplier = async (req, res) => {
   try {
     const user = await Supplier.findById(req.params.id)
       .select("orderList")
       .populate({
         path: "orderList",
-        match: { status: "accepted" || "completed" }, //filter status: "placed"
+        match: { status: "accepted" || "completed" },
         populate: {
           path: "productList",
           populate: {
@@ -65,11 +64,12 @@ const addNewSupplier = async ( request, response ) => {
 }
 
 //get Supplier List
+
 const getSupplierList = async (request, response) => {
 
   try {
     const suppliers = await Supplier.find()
-    .populate("orderList.site") // Populate the "site" field
+    .populate("orderList.site")
     .lean();
 
     if( !suppliers ) {
@@ -85,18 +85,14 @@ const getSupplierList = async (request, response) => {
 };
 
 //get single supplier
+
 const getSingleSupplier = async ( request, response ) => {
 
   const id = request.params.id;
   console.log(`single supplier id ${id}`);
 
   try {
-    const singleSupplier = await Supplier.findOne({ _id: id})
-    .populate({
-      path: "orderList.site",
-      select: "siteName",
-    })
-    .exec();
+    const singleSupplier = await Supplier.findOne({ _id: id}).exec();
     response.status(200).json(singleSupplier);
   } catch ( error ) {
     response.status(500).json(error);
@@ -104,6 +100,7 @@ const getSingleSupplier = async ( request, response ) => {
 }
 
 //Authenticate Supplier and get token
+
 const loginSupplier = async (req, res) => {
   const { email, password } = req.body;
 
@@ -141,13 +138,13 @@ const loginSupplier = async (req, res) => {
       }
     );
   } catch (err) {
-    //Something wrong with the server
     console.error(err.message);
     return res.status(500).send("Server Error");
   }
 };
 
 //Register Supplier
+
 const registerSupplier = async (req, res) => {
   const { supplierName, email, location, contactNumber, productList } = req.body;
 
@@ -210,7 +207,6 @@ const registerSupplier = async (req, res) => {
 
 const getSuppliersByProduct = async (req, res) => {
   try {
-    // const { itemName } = req.body;
    const item = req.query.itemName 
     const suppliers = await Supplier.find({
       productList: {
@@ -226,6 +222,8 @@ const getSuppliersByProduct = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
+
+//update supplier details
 
 const updateSupplierDetails = async ( request, response ) => {
   try{
@@ -259,13 +257,6 @@ const updateSupplierDetails = async ( request, response ) => {
     supplier.productList = productList;
     supplier.orderList = orderList;
 
-    supplier.orderList = await Promise.all(orderList.map(async (order) => {
-
-      const site = await site.findById(order.site).select('siteName').exec();
-      order.site = site.siteName;
-      return order;
-    }));
-
     const updatedSupplier = await supplier.save();
     return response.json({ message: 'Supplier updated', updatedSupplier });
 
@@ -274,6 +265,8 @@ const updateSupplierDetails = async ( request, response ) => {
     return response.status(500).json({ message: 'Internal server error' });
   }
 }
+
+//delete supplier
 
 const deleteSupplier = async ( request, response ) => {
   try{

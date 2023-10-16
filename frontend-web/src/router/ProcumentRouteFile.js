@@ -8,11 +8,12 @@ import DashBoard from '../pages/DashBoard';
 const RouteFile = () => {
   return (
     <Routes>
-        <Route path="/dashboard" element={<DashBoard/>}/>
-        <Route path="/dashboard/allSuppliers" element={<SupplierList/>}/>
-        <Route path='/dashboard/updateSupplier/:id' element={<UpdateSupplier/>}/>
-        <Route path='/dashboard/addSupplier' element={<AddSupplier/>}/>
+      <Route path="/dashboard" element={<DashBoard/>}/>
+      <Route path="/dashboard/allSuppliers" element={<SupplierList/>}/>
+      <Route path='/dashboard/updateSupplier/:id' element={<UpdateSupplier/>}/>
+      <Route path='/dashboard/addSupplier' element={<AddSupplier/>}/>
     </Routes>
+    
   )
 }
 

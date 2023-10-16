@@ -14,6 +14,8 @@ const {
   deleteSupplier,
 } = require("../controllers/supplier.controller");
 
+//define routes for the data manipulation
+
 router.post("/add", addNewSupplier)
 router.get("/singleSupplier/:id", getSingleSupplier);
 router.post("/supplierRegister", registerSupplier);

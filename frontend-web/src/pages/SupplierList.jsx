@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { Button, Grid, IconButton, InputAdornment, TextField, Typography } from '@mui/material'
+import { 
+    Button,
+    Grid, 
+    IconButton, 
+    InputAdornment, 
+    TextField, 
+    Typography 
+} from '@mui/material'
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -15,6 +22,7 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import {saveAs} from 'file-saver';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
+import { toast } from 'react-toastify';
 
 const SupplierList = () => {
 
@@ -69,7 +77,10 @@ const SupplierList = () => {
             setIsLoading(false);
             const newSupplier =  suppliers.filter(( item ) => item._id != supplierId);
             setSuppliers(newSupplier);
-            alert("Supplier deleted successfully!!");
+            toast.success('Supplier deleted successfully!!', {
+                position: 'top-center', 
+                autoClose: 3000,
+            });
         }).catch(( error ) => {
             console.log(`deletion supplie Id ${supplierId}`);
             alert( error );
@@ -127,7 +138,7 @@ const SupplierList = () => {
             </Dialog>
         );
     }
-    }
+}
 
     const renderOrderTable = () => {
     if (selectedSupplierOrder) {
@@ -283,5 +294,6 @@ const SupplierList = () => {
     </>
   );
 }
+
 
 export default SupplierList

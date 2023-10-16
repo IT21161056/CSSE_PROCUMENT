@@ -1,27 +1,47 @@
+/*
+(Functional Component pattern.)
+Imports are grouped together at the top for better organization.
+The component logic is separated into distinct sections: imports, variable declaration, useEffect, rendering, and form submission.
+Comments are added to indicate where your input fields should go.
+*/
+
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Box, Button, Grid, TableContainer, TableCell, TableHead, TableRow, TextField, ThemeProvider, Typography, TableBody } from "@mui/material";
+import { 
+  Box, 
+  Button, 
+  Grid, 
+  TableContainer, 
+  TableCell, 
+  TableHead, 
+  TableRow, 
+  TextField, 
+  ThemeProvider, 
+  Typography, 
+  TableBody 
+} from "@mui/material";
 import Table from '@mui/material/Table';
 import axios from "axios";
 import Container from "@mui/material/Container";
 import { createTheme } from '@mui/material/styles';
+import { toast } from 'react-toastify';
+
+// Factory function to create supplier details
+const createSupplierDetails = () => ({
+  supplierName: "",
+  email: "",
+  location: "",
+  contactNumber: "",
+  productList: [],
+  orderList: [],
+});
 
 const UpdateSupplier = () => {
 
   const { id } = useParams();
-  console.log('params id >>>' +id);
   const navigate  = useNavigate();
 
-  const [supplierDetails, setSupplierDetails] = useState({
-    supplierName: "",
-    email: "",
-    location: "",
-    contactNumber: "",
-    productList: [],
-    orderList: []
-  });
-
-  console.log(supplierDetails);
+  const [supplierDetails, setSupplierDetails] = useState(createSupplierDetails ());
 
   const theme = createTheme({
   palette: {
@@ -36,14 +56,7 @@ const UpdateSupplier = () => {
         .get(`http://localhost:8072/supplier/singleSupplier/${id}`)
         .then(( response ) => {
           console.log(response.data);
-          const updatedSupplierDetails = { ...response.data };
-            updatedSupplierDetails.orderList = updatedSupplierDetails.orderList.map(
-              (order) => ({
-              ...order,
-              site: order.site.siteName,
-            })
-          );
-          setSupplierDetails(updatedSupplierDetails);
+          setSupplierDetails(response.data);
         }).catch (( error ) => {
           alert(`An error occured when fetching particular supplier`);
           console.log(error);
@@ -52,15 +65,15 @@ const UpdateSupplier = () => {
     fetchSupplierData();
   }, [id]);
 
-  console.log('after >>>'+id)
-  console.log(setSupplierDetails);
-
   function updateSupplierData( event ) {
       event.preventDefault();
       axios
         .put('http://localhost:8072/supplier/update/'+id, supplierDetails)
         .then(() => {
-          alert('Supplier details successfully updated!');
+          toast.success('Supplier updated successfully!!', {
+            position: 'top-center', 
+            autoClose: 3000,
+          });
           navigate('/dashboard/allSuppliers');
         }).catch (( error ) => {
           alert('An error occured  when updating supplier data');
@@ -245,7 +258,6 @@ const UpdateSupplier = () => {
                   <TableHead>
                     <TableRow>
                       <TableCell>Product</TableCell>
-                      <TableCell>Site</TableCell>
                       <TableCell>Quantity</TableCell>
                       <TableCell>Required Date</TableCell>
                       <TableCell>Status</TableCell>
@@ -262,17 +274,6 @@ const UpdateSupplier = () => {
                                 size="small"
                                 label="Product"
                                 value={order.product}
-                                onChange={onChange}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <TextField
-                                name={`orderList[${index}].site`}
-                                required
-                                fullWidth
-                                size="small"
-                                label="Site"
-                                value={order.site}
                                 onChange={onChange}
                               />
                             </TableCell>
@@ -323,7 +324,7 @@ const UpdateSupplier = () => {
             onClick={() => navigate("/dashboard/allSuppliers")}
             sx={{ m: 3, width: '40%', borderRadius: '1rem', padding:'0.5rem'}}
           >
-              Cancel Process
+            Cancel Process
           </Button>
           <Button
             type="submit"
@@ -334,7 +335,6 @@ const UpdateSupplier = () => {
           >
             Update Details
           </Button>   
-
         </form> 
       </Box>
     </Container>

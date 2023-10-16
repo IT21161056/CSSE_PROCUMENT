@@ -1,14 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { Box, Button, Grid, MenuItem, Select, TextField, ThemeProvider, Typography } from "@mui/material";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { 
+  Box, 
+  Button, 
+  Grid, 
+  TextField, 
+  ThemeProvider, 
+  Typography 
+} from "@mui/material";
 import axios from "axios";
 import Container from "@mui/material/Container";
-// import { TextareaAutosize } from '@mui/base/TextareaAutosize';
-import Textarea from '@mui/joy/Textarea';
 import { createTheme } from '@mui/material/styles';
 import IconButton from "@mui/material/IconButton";
 import AddIcon from "@mui/icons-material/Add";
-
+import { toast } from 'react-toastify';
 
 const SupplierReg = () => {
 
@@ -34,17 +39,6 @@ const SupplierReg = () => {
     ],
   });
 
-  console.log(supplierDetails);
-
-  // function onChange( event) {
-  //   const { name, value } = event.target;
-
-  //   setSupplierDetails(( prevData ) => ({
-  //     // ...prevData,
-  //     // [ name ] : value
-  //   }))
-  // }
-
   function onChange(event, index) {
     const { name, value } = event.target;
     setSupplierDetails((prevData) => {
@@ -67,7 +61,10 @@ const SupplierReg = () => {
     axios
       .post(`http://localhost:8072/supplier/add`, supplierDetails)
       .then(() => {
-        alert('Supplier added successfully!!')
+        toast.success('Supplier added successfully!!', {
+          position: 'top-center', 
+          autoClose: 3000,
+        });
         setSupplierDetails({
           supplierName: "",
           email: "",
@@ -98,7 +95,7 @@ const SupplierReg = () => {
         display: "flex",
         minHeight: "100vh",
         backgroundColor: 'whitesmoke',
-        alignItems: "center", // Center the content vertically
+        alignItems: "center",
       }}
     >
       <Container
