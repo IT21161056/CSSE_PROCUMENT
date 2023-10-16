@@ -32,26 +32,32 @@ const SupplierList = () => {
     const [selectedSupplierProduct, setSelectedSupplierProduct] = useState(null); 
     const [selectedSupplierOrder, setSelectedSupplierOrder] = useState(null); 
 
+    //copy suppliers to suppliers Array
     const suppliersArray  = suppliers;
 
+    // Open modal to display product details
     const openModalProduct = (productList) => {
         setSelectedSupplierProduct(productList);
         console.log(productList);
     };
     
+    // Close product details modal
     const closeModalProduct = () => {
         setSelectedSupplierProduct(null);
     };
 
+    // Open modal to display order details
     const openModalOrder = (orderList) => {
         setSelectedSupplierOrder(orderList);
         console.log(orderList);
     };
 
+    // Close order details modal
     const closeModalOrder = () => {
         setSelectedSupplierOrder(null);
     };
 
+    // Fetch supplier data from the server
     useEffect(() => {
    
         function fetchSupplierData() {
