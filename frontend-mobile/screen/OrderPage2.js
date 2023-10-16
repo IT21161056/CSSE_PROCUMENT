@@ -8,28 +8,31 @@ import { Ip } from "../Ip";
 
 export default function OrderPage2({ route }) {
 
-  const navigation = useNavigation();
+  const navigation = useNavigation();//create navigation instance
 
   const [date, setDate] = useState(null);
   const { params } = useRoute();
   let item = params;
 
-  const { order } = route.params;
+  const { order } = route.params; //get the order object from route.params
   const [rDate, setRDate] = useState();
+
 
   useEffect(() => {
     let today = new Date();
-    let date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+    let date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();//convert date into more readable format
     setDate(date);
   }, []);
 
   const [{ placedDate, productList, requiredDate, siteId, siteName, totalPrice }] = order; //destructure order object
 
+  //destructure and create new order object 
   const transformedOrder = {
     placedDate,
     requiredDate,
     totalPrice,
     siteName,
+    siteId,
     productList: productList.map(({ product, price, qnty, supplier, supplierName }) => ({
       product: product,
       price,
@@ -39,10 +42,12 @@ export default function OrderPage2({ route }) {
     }))
   };
 
+  
+  //store order and assign order to site
   const sendRequest = () => {
     axios.post(`http://${Ip}:8072/order/${siteId}`, transformedOrder).then((response) => {
       console.log(response.data)
-      Alert.alert("Order placed")
+      Alert.alert("Order placed") //show a Alert
       navigation.navigate("Orders", { order: null })
     }).catch((err) => {
       Alert.alert("Error with place order")
@@ -50,11 +55,12 @@ export default function OrderPage2({ route }) {
     })
   }
 
+  //save as draft in react native Asyncstorage
   const handleDraft = async () => {
     try {
-      const orderJson = JSON.stringify(transformedOrder);
+      const orderJson = JSON.stringify(transformedOrder);//convert to json object
       await AsyncStorage.setItem('draftOrder', orderJson);
-      navigation.navigate('Drafts');
+      navigation.navigate('Drafts');//navigate to drafts
     } catch (error) {
       console.error('Error saving draft order to AsyncStorage:', error);
     }
@@ -81,9 +87,9 @@ export default function OrderPage2({ route }) {
             <Text style={styles.cell}>Uprice</Text>
           </View>
 
-          {order.map((orderItem, index) => (
+          {order.map((orderItem, index) => ( //display the order summary when user click nest button
             <View key={index}>
-              {orderItem.productList.map((product, productIndex) => (
+              {orderItem.productList.map((product, productIndex) => (//display the productList in each order
                 <View style={styles.tableRow} key={productIndex}>
                   <Text style={styles.txt1}>{` ${product.product}`}</Text>
                   <Text style={styles.txt1}>{` ${product.supplierName}`}</Text>

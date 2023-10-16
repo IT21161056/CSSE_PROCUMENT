@@ -47,6 +47,13 @@ const addOrderBySiteManager = async (req, res) => {
 
     site.orderList.unshift(newOrder._id);
 
+    await Site.findByIdAndUpdate(
+      { _id: req.params.id },
+      { $push: { orderList: newOrder._id } },
+      { new: true } // This ensures that the updated site document is returned
+    );
+
+
     for (let i = 0; i < productList.length; i++) {
       await Supplier.findByIdAndUpdate({
         _id: productList[i].supplier,

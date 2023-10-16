@@ -10,10 +10,10 @@ import { Ip } from '../Ip'
 export default function UpdateOrder({ route }) {
   const { params } = useRoute();
   let item = params;
-  const { orderId } = route.params;
+  const { orderId } = route.params; //catch the parsing data
   const navigation = useNavigation();
 
-  const [updateOrder,setUpdateOrder] = useState([])
+
   const [order, setOrder] = useState([]);
   const [value, setValue] = useState(null);
   const [total, setTotal] = useState(0);
@@ -131,6 +131,7 @@ export default function UpdateOrder({ route }) {
     }
   };
 
+
   //fetch the suppliers list when site manager select the product
   const getSupplierByProduct = async (itemName) => {
     setProduct(itemName)
@@ -172,7 +173,7 @@ export default function UpdateOrder({ route }) {
     });
     return total;
   };
-  
+
 
   const sendRequest = async () => {
     try {
@@ -189,75 +190,85 @@ export default function UpdateOrder({ route }) {
     sendRequest()
   }, [])
 
+  const [updateOrder, setUpdateOrder] = useState([])
+  
+  
+
+
   return (
     <SafeAreaView>
-    <Text style={styles.place}>Place Order</Text>
+      {/* {updateOrder.map((item, index) => ( */}
+      <View >
+        <Text style={styles.place}>Update Order</Text>
+        <View style={styles.selectSite}>
+          <Text style={styles.selectText}>Select Site</Text>
+          <SelectList
+            selectedValue={item.siteName}
+            setSelected={(val) => {
+              const selectedSite = sitelist.find((site) => site._id === val);
+              const value = selectedSite ? selectedSite.siteName : 'Unknown Site';
+              setSiteInfo({ key: val, value });
+            }}
+            data={siteNames}
+            placeholder="Select supplier"
+            boxStyles={styles.siteBox}
+          />
+        </View>
 
-    <View style={styles.selectSite}>
-      <Text style={styles.selectText}>Select Site</Text>
-      <SelectList
-        setSelected={(val) => {
-          const selectedSite = sitelist.find(item => item._id === val);
-          const value = selectedSite ? selectedSite.siteName : 'Unknown Site';
-          setSiteInfo({ key: val, value });
-        }}
-        data={siteNames}
-        placeholder="Select supplier"
-        boxStyles={styles.siteBox}
-      />
-    </View>
+        <View style={styles.rdate}>
+          <TouchableOpacity onPress={() => showDatePicker()}>
+            <Text style={styles.rdatetxt}>Required date</Text>
+            <DateTimePickerModal
+              isVisible={isDatePickerVisible}
+              selectedValue={item.requiredDate}
+              mode="date"
+              onConfirm={handleConfirm}
+              onCancel={hideDatePicker}
+            />
+            <TextInput style={styles.input1} placeholder="date" value={requiredDate} />
+          </TouchableOpacity>
+        </View>
 
-    <View style={styles.rdate}>
-      <TouchableOpacity onPress={() => { showDatePicker() }}>
-        <Text style={styles.rdatetxt}>Required date</Text>
-        <DateTimePickerModal
-          isVisible={isDatePickerVisible}
-          mode="date"
-          onConfirm={handleConfirm}
-          onCancel={hideDatePicker}
-        />
-        <TextInput style={styles.input1} placeholder="date" value={requiredDate} />
-      </TouchableOpacity>
-    </View>
+        <View style={styles.productselect}>
+          <Text style={styles.productText}>Select product</Text>
+          <SelectList
+            setSelected={(val) => getSupplierByProduct(val)}
+            data={productNames}
+            placeholder="Select product"
+            boxStyles={styles.productBox}
+          />
+        </View>
 
-    <View style={styles.productselect}>
-      <Text style={styles.productText}>Select product</Text>
-      <SelectList
-        setSelected={(val) => getSupplierByProduct(val)}
-        data={productNames}
-        placeholder="Select product"
-        boxStyles={styles.productBox}
-      />
-    </View>
+        <View style={styles.suppplierView}>
+          <Text style={styles.supplierText}>Select supplier</Text>
+          <SelectList
+            setSelected={(val) => handleSelect(val)}
+            data={supList}
+            placeholder="Select supplier"
+            boxStyles={styles.supplierBox}
+          />
+        </View>
 
-    <View style={styles.suppplierView}>
-      <Text style={styles.supplierText}>Select supplier</Text>
-      <SelectList
-        setSelected={(val) => handleSelect(val)}
-        data={supList}
-        placeholder="Select supplier"
-        boxStyles={styles.supplierBox}
-      />
-    </View>
+        <View style={styles.qnty}>
+          <Text style={styles.qntyText}>Quantity</Text>
+          <TextInput style={styles.input} placeholder="Quantity" onChangeText={(text) => setQnty(text)} />
+        </View>
 
-    <View style={styles.qnty}>
-      <Text style={styles.qntyText}>Quantity</Text>
-      <TextInput style={styles.input} placeholder="Quantity" onChangeText={(text) => setQnty(text)} />
-    </View>
+        <View style={styles.ad}>
+          <TouchableOpacity onPress={handleProducts} style={styles.ad1}>
+            <Icon name="add" style={styles.ad2} size={32} color="#4F8EF7" />
+          </TouchableOpacity>
+          <Text style={styles.ad3}>Add more products</Text>
+        </View>
 
-    <View style={styles.ad}>
-      <TouchableOpacity onPress={handleProducts} style={styles.ad1}>
-        <Icon name="add" style={styles.ad2} size={32} color="#4F8EF7" />
-      </TouchableOpacity>
-      <Text style={styles.ad3}>Add more products</Text>
-    </View>
-
-    <View style={styles.rds}>
-      <Button onPress={handleOrder} style={styles.nxt} title="Next" color='#ffa366' />
-    </View>
-
-  </SafeAreaView>
+        <View style={styles.rds}>
+          <Button onPress={handleOrder} style={styles.nxt} title="Next" color="#ffa366" />
+        </View>
+      </View>
+      {/* ))} */}
+    </SafeAreaView>
   );
+
 
 }
 
@@ -448,6 +459,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderColor: '#ffa366'
   },
-  
+
 
 })

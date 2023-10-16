@@ -1,13 +1,23 @@
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 
-// dotenv.config();
+let connectionInstance; //create a instance 
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URL);
+    if (!connectionInstance) {
+      // Create a new connection only if it doesn't exist
+      await mongoose.connect(process.env.MONGODB_URL, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      });
+      connectionInstance = mongoose.connection;
+      console.log("Connected to MongoDB");
+    }
+    return connectionInstance;
   } catch (err) {
-    console.log(err);
+    console.error("Error connecting to MongoDB:", err);
+    throw err;
   }
 };
 

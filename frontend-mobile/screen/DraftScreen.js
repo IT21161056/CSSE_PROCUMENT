@@ -10,6 +10,7 @@ export default function DraftScreen() {
   const [orderList, setOrderList] = useState([]);
   const navigation = useNavigation()
 
+  //fetching the order list
   const sendRequest = async () => {
     try {
       const response = await axios.get(`http://${Ip}:8072/order/`);
@@ -32,6 +33,7 @@ export default function DraftScreen() {
     fetchData();
   }, []);
 
+  //navigate to UpdateOrder 
   const goToUpdate = (item) => () => {
     navigation.navigate("UpdateOrder", { orderId: item._id });
   }
