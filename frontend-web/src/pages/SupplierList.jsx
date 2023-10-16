@@ -75,7 +75,7 @@ const SupplierList = () => {
         .delete(`http://localhost:8072/supplier/deleteSupplier/${supplierId}`)
         .then(() => {
             setIsLoading(false);
-            const newSupplier =  suppliers.filter(( item ) => item._id != supplierId);
+            const newSupplier =  suppliers.filter(( item ) => item._id !== supplierId);
             setSuppliers(newSupplier);
             toast.success('Supplier deleted successfully!!', {
                 position: 'top-center', 
@@ -92,8 +92,8 @@ const SupplierList = () => {
         const lowerCaseQuery = searchQuery.toLowerCase();
 
         return(
-            supplierName && supplierName.toLowerCase().includes(lowerCaseQuery) ||
-            email && email.toLowerCase().includes(lowerCaseQuery)
+            (supplierName && supplierName.toLowerCase().includes(lowerCaseQuery)) ||
+            (email && email.toLowerCase().includes(lowerCaseQuery))
         );
     });
 

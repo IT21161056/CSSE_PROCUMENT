@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { 
   Box, 
   Button, 
@@ -9,12 +8,25 @@ import {
   ThemeProvider, 
   Typography 
 } from "@mui/material";
+import axios from "axios";
 import Container from "@mui/material/Container";
+import { createTheme } from '@mui/material/styles';
 import IconButton from "@mui/material/IconButton";
 import AddIcon from "@mui/icons-material/Add";
 import { toast } from 'react-toastify';
 
-const SupplierReg = () => {
+// Factory function for creating supplierDetails objects
+function createSupplierDetails(supplierName, email, location, contactNumber, productList) {
+  return {
+    supplierName: supplierName || "",
+    email: email || "",
+    location: location || "",
+    contactNumber: contactNumber || "",
+    productList: productList || [{ name: "", price: "", qty: "" }],
+  };
+}
+
+const AddSupplier = () => {
 
   const navigate = useNavigate();
   const [isSubmiting, setIsSubmiting] = useState(false);
@@ -27,15 +39,7 @@ const SupplierReg = () => {
     },
   });
 
-  const [supplierDetails, setSupplierDetails] = useState({
-    supplierName: "",
-    email: "",
-    loction: "",
-    contactNumber: "",
-    productList: [
-      { name: "", price: "", qty: ""}
-    ],
-  });
+   const [supplierDetails, setSupplierDetails] = useState(createSupplierDetails());
 
   function onChange(event, index) {
     const { name, value } = event.target;
@@ -263,4 +267,4 @@ const SupplierReg = () => {
   )
 }
 
-export default SupplierReg
+export default AddSupplier
