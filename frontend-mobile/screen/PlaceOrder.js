@@ -41,11 +41,11 @@ export default function PlaceOrder() {
     setDatePickerVisibility(true);
   };
 
-  const hideDatePicker = () => {
+  const hideDatePicker = () => { 
     setDatePickerVisibility(false);
   };
 
-  const siteNames = sitelist.map((site) => ({
+  const siteNames = sitelist.map((site) => ({ //data to be display in dropdown
     key: site._id,
     value: site.siteName,
   }));
@@ -111,15 +111,18 @@ export default function PlaceOrder() {
       setSupplier("");
       setProduct("");
       setQnty("");
+      Alert.alert("Order Summary created")
       navigation.navigate("Place2", { order: [...order, newOrder] });
+    
     } else {
       Alert.alert("All fields are required");
     }
   };
 
+
   const handleProducts = () => {
     if (supplier && product && qnty) {
-      const newItem = {
+      const newItem = { //create new order
         product: product,
         supplierName: supplier.name,
         supplier: supplier.id,
@@ -132,6 +135,7 @@ export default function PlaceOrder() {
       setQnty("");
     }
   };
+
 
   //fetch the suppliers list when site manager select the product
   const getSupplierByProduct = async (itemName) => {
@@ -146,6 +150,7 @@ export default function PlaceOrder() {
       throw error;
     }
   };
+  
 
   const handleSelect = (val) => {
     const selectedProduct = supList.find((product) => product.value === val);

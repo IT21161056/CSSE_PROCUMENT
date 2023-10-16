@@ -8,12 +8,12 @@ import { useNavigation } from "@react-navigation/native";
 
 export default function OrderScreen() {
 
-  const [orderList, setOrderList] = useState([]);
+  const [orderList, setOrderList] = useState([]);//fetch the order list site manager has been placed
   const navigation = useNavigation();
 
   const sendRequest = () => {
     axios.get(`http://${Ip}:8072/order/`,).then((response) => {
-      setOrderList(response.data)
+      setOrderList(response.data)//set respond data 
     }).catch((err) => {
       Alert.alert("Error with fetching Order List")
       console.log(err)
@@ -52,7 +52,8 @@ export default function OrderScreen() {
               <Text >{`Required Date: ${orderItem.requiredDate}`}</Text>
               <Text >{`Site Name: ${orderItem.siteName}`}</Text>
               <Text style={styles.total}>{`Order Cost:  Rs. ${orderItem.totalPrice}.00`}</Text>
-              <Text style={orderItem.status === 'waiting' ? styles.yellow : styles.green}>{`${orderItem.status}`}</Text>
+              <Text style={orderItem.status === 'waiting' ? styles.yellow : styles.green}>{`${orderItem.status}`}</Text>{/*if order greater 
+              than 100000 show waiting and if less tha show placed label*/}
             </View>
           </View>
         ))}
@@ -99,7 +100,7 @@ const styles = StyleSheet.create({
   green: {
     backgroundColor: '#00e600',
     position: 'absolute',
-    left: 220,
+    left: 210,
     bottom: 1,
     borderRadius: 8,
     padding: 5,
@@ -110,7 +111,7 @@ const styles = StyleSheet.create({
   yellow: {
     backgroundColor: '#ffb366',
     position: 'absolute',
-    left: 220,
+    left: 210,
     bottom: 1,
     borderRadius: 8,
     padding: 5,

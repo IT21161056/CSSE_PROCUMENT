@@ -213,7 +213,7 @@ const unacceptOrderBySuppiler = async (req, res) => {
 
 //add Order by Site Manager
 const addOrderBySiteManager = async (req, res) => {
-  const { placedDate, requiredDate, productList, totalPrice,siteName } = req.body;
+  const { placedDate, requiredDate, productList, totalPrice, siteName } = req.body;
   const isDraft = true;
   const approvalStatus = false;
   const isRestricted = false;
@@ -239,6 +239,13 @@ const addOrderBySiteManager = async (req, res) => {
     const newOrder = await order.save();
 
     site.orderList.unshift(newOrder._id);
+
+    await Site.findByIdAndUpdate(
+      { _id: req.params.id },
+      { $push: { orderList: newOrder._id } },
+      { new: true } // This ensures that the updated site document is returned
+    );
+
 
     for (let i = 0; i < productList.length; i++) {
       await Supplier.findByIdAndUpdate({
