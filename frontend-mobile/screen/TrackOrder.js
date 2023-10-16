@@ -1,25 +1,54 @@
-import React from "react";
-import { FlatList, SafeAreaView, StyleSheet, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  FlatList,
+  SafeAreaView,
+  StyleSheet,
+  Touchable,
+  TouchableOpacity,
+  View,
+  Text,
+} from "react-native";
 import OrderCard from "../components/OrderCard";
-
-const orders = [
-  { id: 1, date: "2023/10/12", status: "approved", totalCost: 5000000 },
-  { id: 2, date: "2023/10/12", status: "waiting", totalCost: 5000000 },
-  { id: 3, date: "2023/10/12", status: "waiting", totalCost: 5000000 },
-  { id: 4, date: "2023/10/12", status: "declined", totalCost: 5000000 },
-  { id: 5, date: "2023/10/12", status: "approved", totalCost: 5000000 },
-  { id: 6, date: "2023/10/12", status: "waiting", totalCost: 5000000 },
-  { id: 7, date: "2023/10/12", status: "declined", totalCost: 5000000 },
-  { id: 8, date: "2023/10/12", status: "approved", totalCost: 5000000 },
-];
+import Icon from "react-native-vector-icons/Ionicons";
+// import { orders } from "../assets/data/db";
+import axios from "axios";
+import { Ip } from "../Ip";
+import { useNavigation } from "@react-navigation/native";
 
 export default function TrackOrder() {
+  const [orders, setOrders] = useState([]);
+  const navigate = useNavigation();
+  useEffect(() => {
+    const fetch = async () => {
+      await axios
+        .get(`http://${Ip}:8072/order`)
+        .then((res) => {
+          console.log(res.data);
+          setOrders(res.data);
+        })
+        .catch((err) => {});
+    };
+    fetch();
+  }, []);
+
+  const reviewedList = () => {
+    navigate.navigate("ReviewedOrders");
+  };
+
   return (
     <View>
+      <View style={styles.topBar}>
+        <TouchableOpacity style={styles.Btn} onPress={reviewedList}>
+          <Icon name="document-text" size={20} color="black" />
+          <Text style={{ color: "white", fontWeight: 600 }}>
+            show Reviewed orders
+          </Text>
+        </TouchableOpacity>
+      </View>
       <FlatList
         data={orders}
         renderItem={({ item }) => <OrderCard item={item} />}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id}
         // contentContainerStyle={{ columnGap: 10 }}
         showsHorizontalScrollIndicator={false}
       />
@@ -31,6 +60,21 @@ const styles = StyleSheet.create({
   container: {
     alignItems: "center",
     justifyContent: "center",
+  },
+  topBar: {
+    alignItems: "center",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+  },
+  Btn: {
+    backgroundColor: "#FF9933",
+    padding: 10,
+    margin: 10,
+    borderRadius: 8,
+    display: "flex",
+    flexDirection: "row",
+    gap: 5,
   },
   login: {
     fontSize: 30,

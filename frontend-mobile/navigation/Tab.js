@@ -9,6 +9,8 @@ import TrackOrder from "../screen/TrackOrder";
 import DraftScreen from "../screen/DraftScreen";
 import OrderPage2 from "../screen/OrderPage2";
 import ReviewOrder from "../screen/ReviewOrder";
+import ReviewedOrders from "../screen/ReviewedOrders";
+import UpdateOrder from "../screen/UpdateOrder";
 
 const Tabs = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -55,7 +57,7 @@ export default function Tab() {
         {() => (
           <Stack.Navigator screenOptions={{ headerShown: "false" }}>
             <Stack.Screen
-              name="place"
+              name="Place Order"
               component={PlaceOrder}
               options={{ headerShown: "false" }}
             />
@@ -89,8 +91,13 @@ export default function Tab() {
         {() => (
           <Stack.Navigator screenOptions={{ headerShown: "false" }}>
             <Stack.Screen
-              name="order"
+              name="Order List"
               component={OrderScreen}
+              options={{ headerShown: "false" }}
+            />
+            <Stack.Screen
+              name="UpdateOrder"
+              component={UpdateOrder}
               options={{ headerShown: "false" }}
             />
           </Stack.Navigator>
@@ -127,6 +134,11 @@ export default function Tab() {
               component={ReviewOrder}
               options={{ headerShown: "false" }}
             />
+            <Stack.Screen
+              name="ReviewedOrders"
+              component={ReviewedOrders}
+              options={{ headerShown: "false" }}
+            />
           </Stack.Navigator>
         )}
       </Tabs.Screen>
@@ -152,6 +164,11 @@ export default function Tab() {
         {() => (
           <Stack.Navigator screenOptions={{ headerShown: "false" }}>
             <Stack.Screen name="Draft" component={DraftScreen} />
+            <Stack.Screen
+              name="UpdateOrder"
+              component={UpdateOrder}
+              options={{ headerShown: "false" }}
+            />
           </Stack.Navigator>
         )}
       </Tabs.Screen>

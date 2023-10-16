@@ -4,9 +4,9 @@ const Site = require("../models/Site.model");
 @method POST
 */
 const createSite = async (req, res) => {
-  const { siteName, siteAddress, siteContactNumber, siteManager } = req.body;
+  const { siteName, siteAddress, siteContactNumber, siteManager, allocatedBudget } = req.body;
 
-  if (!siteName || !siteAddress || !siteContactNumber || !siteManager) {
+  if (!siteName || !siteAddress || !siteContactNumber || !siteManager || !allocatedBudget) {
     return res.send("All fields are required!");
   }
 
@@ -15,6 +15,7 @@ const createSite = async (req, res) => {
     siteAddress,
     siteContactNumber,
     siteManager,
+    allocatedBudget
   });
 
   await site

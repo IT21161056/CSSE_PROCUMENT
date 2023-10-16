@@ -23,14 +23,25 @@ app.use("/product", productRoutes);
 const siteRoutes = require("./routes/site.routes.js");
 app.use("/site", siteRoutes);
 
+const orderReviewRoutes = require("./routes/OrderReview.routes.js");
+app.use("/orderReview", orderReviewRoutes);
+
 // pasindu route
 const supplierRoute = require("./routes/supplier.routes.js");
 app.use("/supplier", supplierRoute);
+
 const supplierReportRoute = require("./routes/supplierReport.routes.js");
 app.use("/orders_pdf", supplierReportRoute);
 
 const orderRoute = require("./routes/order.routes.js");
 app.use("/order", orderRoute);
+
+const requestRoutes = require("./routes/request.routes");
+app.use("/requestlist", requestRoutes);
+
+const recommendRoutes = require("./routes/recommend.routes");
+app.use("/recommendlist", recommendRoutes);
+
 
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB");
