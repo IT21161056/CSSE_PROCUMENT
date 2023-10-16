@@ -18,10 +18,20 @@ export default function LoginScreen() {
     password: "",
   });
 
-  console.log(credentials);
-
-  const login = () => {
-    axios.post(`http://${Ip}:8072/login`, credentials);
+  const login = async () => {
+    console.log(credentials);
+    await axios
+      .post(`http://${Ip}:8072/siteManager/login`, credentials)
+      .then((res) => {
+        setCredentials({
+          email: "",
+          password: "",
+        });
+        navigation.navigate("Tabs");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
   return (
     <View style={styles.container}>
@@ -61,11 +71,7 @@ export default function LoginScreen() {
       </View>
 
       <View style={styles.loginBtn}>
-        <Button
-          color="#ffa366"
-          title="Login"
-          onPress={() => navigation.navigate("Tabs")}
-        />
+        <Button color="#ffa366" title="Login" onPress={login} />
       </View>
       <TouchableOpacity style={{ marginTop: 30 }}>
         <Text
