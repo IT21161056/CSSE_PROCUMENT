@@ -13,7 +13,6 @@ import SearchIcon from '@mui/icons-material/Search';
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import {saveAs} from 'file-saver';
-import { createTheme } from '@mui/material/styles';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 
@@ -27,14 +26,6 @@ const SupplierList = () => {
 
     const suppliersArray  = suppliers;
     console.log(suppliersArray);
-
-    // const theme = createTheme({
-    //   palette: {
-    //     primary: {
-    //       main: '#FFA500', // Your primary color here
-    //     },
-    //   },
-    // });
 
     const openModalProduct = (productList) => {
         setSelectedSupplierProduct(productList);
@@ -140,8 +131,8 @@ const SupplierList = () => {
 
     const renderOrderTable = () => {
     if (selectedSupplierOrder) {
-      return (
-        <Dialog open={Boolean(selectedSupplierOrder)} onClose={closeModalOrder}>
+        return (
+            <Dialog open={Boolean(selectedSupplierOrder)} onClose={closeModalOrder}>
           <DialogContent>
             <TableContainer>
               <Table>
@@ -155,13 +146,13 @@ const SupplierList = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {selectedSupplierOrder.map(( product, index ) => (
+                  {selectedSupplierOrder.map(( order, index ) => (
                     <TableRow key={ index }>
-                      <TableCell>{product.product}</TableCell>
-                      <TableCell>{product.site.siteName}</TableCell>
-                      <TableCell>{product.quantity}</TableCell>
-                      <TableCell>{product.requiredDate}</TableCell>
-                      <TableCell>{product.status}</TableCell>
+                      <TableCell>{order.product}</TableCell>
+                      <TableCell>{order.site.siteName}</TableCell>
+                      <TableCell>{order.quantity}</TableCell>
+                      <TableCell>{order.requiredDate}</TableCell>
+                      <TableCell>{order.status}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

@@ -25,13 +25,14 @@ const SupplierSchema = new Schema({
     orderList: [
       {
         product: { type: String, required: true },
-        site: { type: mongoose.Schema.Types.ObjectId, ref: "Site" },
+        site: { type: mongoose.Schema.Types.ObjectId, ref: "Site", select: "siteName" },
         quantity: { type: Number, required: true },
         requiredDate: { type: String, required: true },
         status: { type: String, required: true, default: "pending" },
         orderRef: { type: mongoose.Schema.Types.ObjectId, ref: "Order" },
       },
     ],
+
 });
 
 module.exports = Supplier = mongoose.model("Supplier", SupplierSchema);

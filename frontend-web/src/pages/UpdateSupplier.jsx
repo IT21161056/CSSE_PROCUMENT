@@ -17,12 +17,8 @@ const UpdateSupplier = () => {
     email: "",
     location: "",
     contactNumber: "",
-    productList: [
-      {name: "", price: "", qty: ""}
-    ],
-    orderList: [
-      {product: "", site: "", quantity: "", requiredDate: "", status: "", orderRef: ""}
-    ]
+    productList: [],
+    orderList: []
   });
 
   console.log(supplierDetails);
@@ -40,14 +36,21 @@ const UpdateSupplier = () => {
         .get(`http://localhost:8072/supplier/singleSupplier/${id}`)
         .then(( response ) => {
           console.log(response.data);
-          setSupplierDetails(response.data);
+          const updatedSupplierDetails = { ...response.data };
+            updatedSupplierDetails.orderList = updatedSupplierDetails.orderList.map(
+              (order) => ({
+              ...order,
+              site: order.site.siteName,
+            })
+          );
+          setSupplierDetails(updatedSupplierDetails);
         }).catch (( error ) => {
           alert(`An error occured when fetching particular supplier`);
           console.log(error);
         })
     }
     fetchSupplierData();
-  }, []);
+  }, [id]);
 
   console.log('after >>>'+id)
   console.log(setSupplierDetails);
@@ -64,30 +67,28 @@ const UpdateSupplier = () => {
           console.log(error);
         })
   }
-
-  // function onChange( event ){
-  //   const { name, value } = event.target;
-  //   setSupplierDetails(( prevData ) => ({
-  //     ...prevData,
-  //     [name] : value
-  //   }));
-  // }
-
+  
   function onChange(event) {
-    const { name, value } = event.target;
-    const fieldArray = name.split(".");
-    const fieldName = fieldArray[0];
-    const fieldIndex = parseInt(fieldArray[1], 10);
+      const { name, value } = event.target;
+      const fieldArray = name.split(".");
+      const fieldName = fieldArray[0];
+      const fieldIndex = parseInt(fieldArray[1], 10);
 
-    setSupplierDetails((prevData) => {
-      const newData = { ...prevData };
-      if (fieldArray.length === 2) {
-        newData[fieldName][fieldIndex][fieldArray[2]] = value;
-      } else {
-        newData[fieldName] = value;
-      }
-      return newData;
-    });
+      setSupplierDetails((prevData) => {
+        const newData = { ...prevData };
+
+        if (fieldArray.length === 2) {
+          if (fieldName === "productList") {
+            newData.productList[fieldIndex][fieldArray[2]] = value;
+          } else if (fieldName === "orderList") {
+            newData.orderList[fieldIndex][fieldArray[2]] = value;
+          }
+        } else {
+          newData[fieldName] = value;
+        }
+
+        return newData;
+      });
   }
 
   return (
@@ -97,7 +98,7 @@ const UpdateSupplier = () => {
         display: "flex",
         minHeight: "100vh",
         backgroundColor: 'whitesmoke',
-        alignItems: "center", // Center the content vertically
+        alignItems: "center",
       }}
     >
       <Container
@@ -192,7 +193,7 @@ const UpdateSupplier = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {supplierDetails.productList.map(( product, index ) => (
+                  {supplierDetails.productList && supplierDetails.productList.map(( product, index ) => (
                     <TableRow key={ index }>
                       <TableCell>
                         <TextField
@@ -209,6 +210,7 @@ const UpdateSupplier = () => {
                           <TextField
                             name={`productList[${index}].price`}
                             required
+                            type="number"
                             fullWidth
                             size="small"
                             label="Product Price"
@@ -221,6 +223,7 @@ const UpdateSupplier = () => {
                             name={`productList[${index}].qty`}
                             required
                             fullWidth
+                            type="number"
                             size="small"
                             label="Product Quantity"
                             value={product.qty}
@@ -246,11 +249,10 @@ const UpdateSupplier = () => {
                       <TableCell>Quantity</TableCell>
                       <TableCell>Required Date</TableCell>
                       <TableCell>Status</TableCell>
-                      {/* <TableCell>Order Reference</TableCell> */}
                     </TableRow>
                   </TableHead>
                       <TableBody>
-                        {supplierDetails.orderList.map((order, index) => (
+                        {supplierDetails.orderList && supplierDetails.orderList.map((order, index) => (
                           <TableRow key={index}>
                             <TableCell>
                               <TextField
@@ -307,24 +309,13 @@ const UpdateSupplier = () => {
                                 onChange={onChange}
                               />
                             </TableCell>
-                            {/* <TableCell>
-                              <TextField
-                                name={`orderList[${index}].orderRef`}
-                                required
-                                fullWidth
-                                size="small"
-                                label="Order Reference"
-                                value={order.orderRef}
-                                onChange={onChange}
-                              />
-                            </TableCell> */}
                           </TableRow>
                         ))}
                       </TableBody>
                     </Table>
                   </TableContainer>             
             </Grid>
-          </Grid>
+          </Grid> 
           <Button
             type="button"
             variant="contained"
