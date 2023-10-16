@@ -198,8 +198,8 @@ module.exports = (suppliers) => {
           <tbody>
     
          ${suppliers.map((sup) => {
-          const productList = sup.productList.map((product) => `${product.name}: ${product.price} ${product.qty}`);
-          const orderList = sup.orderList.map((order) => `(${order.site.siteName})`);
+          const productList = sup.productList.map((product) => `name: ${product.name} : price: ${product.price} qty: ${product.qty}`);
+          const orderList = sup.orderList.map((order) => `( ${order.site && order.site.siteName || 'Site Not Available'} )`);
             return (
                 `<tr>
                     <td class="service">${sup.supplierName}</td>

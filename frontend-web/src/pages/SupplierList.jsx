@@ -160,7 +160,7 @@ const SupplierList = () => {
                   {selectedSupplierOrder.map(( order, index ) => (
                     <TableRow key={ index }>
                       <TableCell>{order.product}</TableCell>
-                      <TableCell>{order.site.siteName}</TableCell>
+                      <TableCell>{order.site && order.site.siteName ? order.site.siteName : 'Site Not Available'}</TableCell>
                       <TableCell>{order.quantity}</TableCell>
                       <TableCell>{order.requiredDate}</TableCell>
                       <TableCell>{order.status}</TableCell>
@@ -173,6 +173,7 @@ const SupplierList = () => {
         </Dialog>
       );
     }
+    return null; // Return null if selectedSupplierOrder is null
   };
 
 
