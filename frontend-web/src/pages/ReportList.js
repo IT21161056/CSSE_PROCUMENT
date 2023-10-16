@@ -46,7 +46,7 @@ const ReportList = () => {
             <Text>{item.siteName}</Text>
             <Text>
               <ViewBtn >
-              <LinkTo href = "/requests">View</LinkTo>
+              <LinkTo href = "/requestlists">View</LinkTo>
               </ViewBtn>
             </Text>
           </ListContainerRow>

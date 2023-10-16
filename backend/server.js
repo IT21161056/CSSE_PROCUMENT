@@ -39,6 +39,9 @@ app.use("/order", orderRoute);
 const requestRoutes = require("./routes/request.routes");
 app.use("/requestlist", requestRoutes);
 
+const recommendRoutes = require("./routes/recommend.routes");
+app.use("/recommendlist", recommendRoutes);
+
 
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB");

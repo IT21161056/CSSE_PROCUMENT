@@ -4,15 +4,12 @@ import SupplierList from '../pages/SupplierList';
 import ProductDetails from '../pages/ProductDetails';
 import UpdateSupplier from '../pages/UpdateSupplier';
 import SupplierReg from '../pages/SupplierReg';
-<<<<<<< HEAD
 import ReportList from '../pages/ReportList';
 import Requests from '../pages/Requests';
 import Recommends from '../pages/Recommends';
 import RecommendList from '../pages/RecommendList';
 import UpdateRecommends from '../pages/UpdateRecommends';
-=======
 import DashBoard from '../pages/DashBoard';
->>>>>>> 1b9516d9eec627b2aa09af8ecc952c8f2a68c662
 
 const RouteFile = () => {
   return (
