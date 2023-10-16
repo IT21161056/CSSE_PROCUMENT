@@ -7,8 +7,6 @@ const config = require("config");
 //get Supplier details by id
 const getSupplierDetailsById = async ( request, response ) => {
   try {
-    //get user details
-    //-password : dont return the pasword
     const user = await Supplier.findById(request.params.id).select("-password");
 
     response.json(user);
@@ -19,13 +17,14 @@ const getSupplierDetailsById = async ( request, response ) => {
 };
 
 //Accepted Orders or Completed Orders For Each Supplier
+
 const getAcceptedOrCompletedOrdersForEachSupplier = async (req, res) => {
   try {
     const user = await Supplier.findById(req.params.id)
       .select("orderList")
       .populate({
         path: "orderList",
-        match: { status: "accepted" || "completed" }, //filter status: "placed"
+        match: { status: "accepted" || "completed" },
         populate: {
           path: "productList",
           populate: {
@@ -65,12 +64,15 @@ const addNewSupplier = async ( request, response ) => {
 }
 
 //get Supplier List
+
 const getSupplierList = async (request, response) => {
 
   try {
-    const suppliers = await Supplier.find().lean();
+    const suppliers = await Supplier.find()
+    .populate("orderList.site")
+    .lean();
 
-    if( !suppliers) {
+    if( !suppliers ) {
       return response.status(400).json({ message: 'No suppliers found!!'})
     }
     response.json(suppliers);
@@ -83,21 +85,22 @@ const getSupplierList = async (request, response) => {
 };
 
 //get single supplier
+
 const getSingleSupplier = async ( request, response ) => {
+
   const id = request.params.id;
   console.log(`single supplier id ${id}`);
 
-  let singleSupplier;
-
   try {
-    singleSupplier = await Supplier.findOne({ _id: id});
+    const singleSupplier = await Supplier.findOne({ _id: id}).exec();
     response.status(200).json(singleSupplier);
   } catch ( error ) {
-    response.status(401).json(error);
+    response.status(500).json(error);
   }
 }
 
 //Authenticate Supplier and get token
+
 const loginSupplier = async (req, res) => {
   const { email, password } = req.body;
 
@@ -135,13 +138,13 @@ const loginSupplier = async (req, res) => {
       }
     );
   } catch (err) {
-    //Something wrong with the server
     console.error(err.message);
     return res.status(500).send("Server Error");
   }
 };
 
 //Register Supplier
+
 const registerSupplier = async (req, res) => {
   const { supplierName, email, location, contactNumber, productList } = req.body;
 
@@ -204,7 +207,6 @@ const registerSupplier = async (req, res) => {
 
 const getSuppliersByProduct = async (req, res) => {
   try {
-    // const { itemName } = req.body;
    const item = req.query.itemName 
     const suppliers = await Supplier.find({
       productList: {
@@ -221,50 +223,66 @@ const getSuppliersByProduct = async (req, res) => {
   }
 };
 
+//update supplier details
+
 const updateSupplierDetails = async ( request, response ) => {
-  const{
-    supplierName,
-    email,
-    location,
-    contactNumber,
-    productList
-  } = request.body;
+  try{
+    const{
+      supplierName,
+      email,
+      location,
+      contactNumber,
+      productList,
+      orderList,
+      _id
+    } = request.body;
 
-  console.log(request.body);
+    console.log(request.body);
 
-  if( !supplierName || !email || !contactNumber || !location || !productList) {
-    return response.status(400).json({ message: 'All fields are required'});
+    if( !supplierName || !location || !email || !contactNumber || !productList || !orderList) {
+      return response.status(400).json({ message: 'All fields are required'});
+    }
+
+    //confirm supplier exist to update
+    const supplier = await Supplier.findById(_id).exec();
+
+    if( !supplier ) {
+      return response.status(400).json({ message: 'Supplier not found!!'});
+    }
+
+    supplier.supplierName = supplierName;
+    supplier.email = email;
+    supplier.location = location;
+    supplier.contactNumber = contactNumber;
+    supplier.productList = productList;
+    supplier.orderList = orderList;
+
+    const updatedSupplier = await supplier.save();
+    return response.json({ message: 'Supplier updated', updatedSupplier });
+
+  } catch (error) {
+    console.error('Error updating supplier:', error);
+    return response.status(500).json({ message: 'Internal server error' });
   }
-
-  //confirm supplier exist to update
-  const supplier = await Supplier.findById(_id).exec();
-
-  if( !supplier ) {
-    return response.status(400).json({ message: 'Supplier not found!!'});
-  }
-
-  supplier.supplierName = supplierName;
-  supplier.location = location;
-  supplier.email = email;
-  supplier.contactNumber = contactNumber;
-  supplier.productList = productList;
-
-  const updateSupplier = await supplier.save();
-  response.json(`'${updateSupplier.supplier}' updated!`);
 }
+
+//delete supplier
 
 const deleteSupplier = async ( request, response ) => {
   try{
-    const id = request.params.id;
+    const supplierId = request.params.id;
+    console.log("deletion id >>>"+supplierId);
 
-    await Supplier.findByIdAndDelete( id ) 
+    await Supplier.findByIdAndDelete( supplierId ) 
     .then(() => {
       response.status(200).json({ message: 'Order Deleted'});
     }).catch(( error ) => {
 
       //confirm data
-      if( !id ) 
+      if( !supplierId ) 
         return response.status(400).json({ message: 'Order not found!!'})
+      if( !Supplier)
+        return response.status(400).json({ message: "Supplier not found" });
       else
         response.json({ message: 'Error with delete item ', error: error.message});
       
@@ -276,6 +294,7 @@ const deleteSupplier = async ( request, response ) => {
 
 module.exports = {
   addNewSupplier,
+  getSingleSupplier,
   getSupplierList,
   loginSupplier,
   registerSupplier,

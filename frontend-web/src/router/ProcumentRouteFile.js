@@ -1,7 +1,6 @@
 import React from 'react'
 import { Routes, Route } from 'react-router-dom';
 import SupplierList from '../pages/SupplierList';
-import ProductDetails from '../pages/ProductDetails';
 import UpdateSupplier from '../pages/UpdateSupplier';
 import SupplierReg from '../pages/SupplierReg';
 import ReportList from '../pages/ReportList';
@@ -27,6 +26,7 @@ const RouteFile = () => {
         <Route path="/recommendlist" element={<RecommendList/>}></Route>
         <Route path="/updaterecommendst" element={<UpdateRecommends/>}></Route>
     </Routes>
+    
   )
 }
 

@@ -49,7 +49,8 @@ module.exports = (suppliers) => {
           }
           
           #logo img {
-            width: 400px;
+            width: 200px;
+            height: 200px;
             object-fit: cover;
           }
           
@@ -161,10 +162,10 @@ module.exports = (suppliers) => {
     
         <header class="clearfix">
             <div id="logo">
-                <img src="http://localhost:3001/logo.png" height="100px">
+                <img src="http://localhost:3000/c2.png" height="100px">
             </div>
         <!-- <h1><b>procument Management</b></h1> -->
-        <h1>Orders Details</h1>
+        <h1>Supplier Details</h1>
     
         <div id="company" class="clearfix">
           <div> Peris Marketing Services Pvt Ltd </div>
@@ -173,7 +174,7 @@ module.exports = (suppliers) => {
           <div><a href="#">pasindu.@gmail.com</a></div>
         </div>
         <div id="project">
-          <div><span>Position</span>Procument Staff</div>
+          <div><span>Position</span>Procubment Staff</div>
           <div><span>Name</span>Pasindu Perakum</div>
          
           <div><span>EMAIL</span> <a href="#">pasindu.marketing@gmail.com</a></div>
@@ -190,19 +191,23 @@ module.exports = (suppliers) => {
               <th>Location</th>
               <th>Contact Number</th>
               <th>Products</th>
+              <th>Orders</th>
               
             </tr>
           </thead>
           <tbody>
     
          ${suppliers.map((sup) => {
+          const productList = sup.productList.map((product) => `${product.name} : ${product.price} : ${product.qty}`);
+          const orderList = sup.orderList.map((order) => `( ${order.site && order.site.siteName || 'Site Not Available'} )`);
             return (
                 `<tr>
                     <td class="service">${sup.supplierName}</td>
                     <td class="desc">${sup.email}</td>
                     <td class="desc">${sup.location}</td>
                     <td class="desc">${sup.contactNumber}</td>
-                    <td class="unit">${sup.productList}</td>
+                    <td class="unit">${productList.join(', ')}</td>
+                    <td class="unit">${orderList.join(', ')}</td>
                 </tr> `
             )
          })}  

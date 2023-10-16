@@ -3,6 +3,7 @@ const router = express.Router();
 
 const {
   addNewSupplier,
+  getSingleSupplier,
   getSupplierList,
   loginSupplier,
   registerSupplier,
@@ -13,7 +14,10 @@ const {
   deleteSupplier,
 } = require("../controllers/supplier.controller");
 
+//define routes for the data manipulation
+
 router.post("/add", addNewSupplier)
+router.get("/singleSupplier/:id", getSingleSupplier);
 router.post("/supplierRegister", registerSupplier);
 router.post("/supplierLogin", loginSupplier);
 router.get("/all", getSupplierList);
