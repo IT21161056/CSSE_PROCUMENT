@@ -111,7 +111,7 @@ const getDeliveryListByOrderId = async (req, res) => {
 //get Order details
 const getOrderDetails = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id);
+    const order = await Order.findById(req.params.id).populate("site");
     if (!order) {
       return res.send("No order found!");
     }
@@ -125,7 +125,7 @@ const getOrderDetails = async (req, res) => {
 //get Order List
 const getOrderList = async (req, res) => {
   try {
-    const orderList = await Order.find();
+    const orderList = await Order.find().populate("site");
 
     if (!orderList) {
       return res.send("No orders!");
@@ -213,13 +213,11 @@ const unacceptOrderBySuppiler = async (req, res) => {
 
 //add Order by Site Manager
 const addOrderBySiteManager = async (req, res) => {
-  const { placedDate, requiredDate, productList } = req.body;
+  const { placedDate, requiredDate, productList, totalPrice,siteName } = req.body;
   const isDraft = true;
   const approvalStatus = false;
   const isRestricted = false;
-  const status = "draft";
-  const totalPrice = 0;
-
+  const status = totalPrice <= 100000 ? "placed" : "waiting"
   const site = await Site.findById(req.params.id);
 
   if (!site) return res.send("Some Data fields are not found!");
@@ -229,6 +227,7 @@ const addOrderBySiteManager = async (req, res) => {
       isDraft,
       placedDate,
       requiredDate,
+      siteName,
       approvalStatus,
       isRestricted,
       productList,
@@ -245,29 +244,70 @@ const addOrderBySiteManager = async (req, res) => {
       await Supplier.findByIdAndUpdate({
         _id: productList[i].supplier,
       }).then((sup) => {
-        console.log("found");
-        console.log(sup.orderList);
         sup.orderList.unshift({
           product: productList[i].product,
           site: site._id,
           quantity: productList[i].qnty,
           requiredDate: requiredDate,
           orderRef: newOrder._id,
+          supplierName: productList[i].supplierName,
         });
         sup.save();
-        console.log(1);
       });
-      console.log(2);
     }
-    console.log(3);
+
     res.json({ message: "successful!" });
-    console.log(4);
   } catch (err) {
-    //Something wrong with the server
-    console.log(err.message);
     return res.status(500).send("Server Error");
   }
 };
+
+//update orderBy site manager
+const updateOrderBySiteManager = async (req, res) => {
+  const orderId = req.params.id; // Assuming you have a route parameter for the order ID
+  const { placedDate, requiredDate, productList, totalPrice, siteName } = req.body;
+  const status = totalPrice <= 100000 ? "placed" : "waiting";
+
+  try {
+    // Update the order by its ID
+    const updatedOrder = await Order.findByIdAndUpdate(orderId, {
+      placedDate,
+      requiredDate,
+      siteName,
+      productList,
+      status,
+      totalPrice,
+    });
+
+    if (!updatedOrder) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    res.json({ message: "Order updated successfully", updatedOrder });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server Error" });
+  }
+};
+
+//getOrderBy Id
+const getOrderByOrderId = async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const order = await Order.findById(id);
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    return res.json({ success: true, order });
+  } catch (error) {
+    console.error('Error fetching order by order ID:', error);
+    return res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
 
 //Confirm Order by Site Manager
 const comfirmOrderBySiteManager = async (req, res) => {
@@ -368,6 +408,8 @@ module.exports = {
   getOrderDetails,
   getOrderList,
   addOrderBySiteManager,
+  updateOrderBySiteManager,
+  getOrderByOrderId,
   comfirmOrderBySiteManager,
   approvedOrDisapprovedOrderByManager,
   placedOrderByProcurementOfficer,

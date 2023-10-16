@@ -40,6 +40,30 @@ const getAcceptedOrCompletedOrdersForEachSupplier = async (req, res) => {
   }
 };
 
+//add new supplier
+
+const addNewSupplier = async ( request, response ) => {
+  const { supplierName, email, location, contactNumber, productList } = request.body;
+
+  if ( !supplierName || !email || !location || !contactNumber || !productList) {
+    return response.status(400).json({ message: 'All fields are required'});
+  }
+
+  const supplier = await Supplier.create({
+    supplierName,
+    email,
+    location,
+    contactNumber,
+    productList,
+  });
+
+  if (supplier) {
+    return response.status(201).json({ message: "New Supplier created" });
+  } else {
+    return request.status(400).json({ message: "Invalid supplier data recived" });
+  }
+}
+
 //get Supplier List
 const getSupplierList = async (request, response) => {
 
@@ -119,7 +143,7 @@ const loginSupplier = async (req, res) => {
 
 //Register Supplier
 const registerSupplier = async (req, res) => {
-  const { supplierName, email, password, address, contactNumber, productList } = req.body;
+  const { supplierName, email, location, contactNumber, productList } = req.body;
 
   console.log(req.body);
   try {
@@ -136,10 +160,10 @@ const registerSupplier = async (req, res) => {
     user = new Supplier({
       supplierName,
       email,
-      password,
-      address,
+      location,
       contactNumber,
       productList,
+      orderList
     });
 
     //Encrypt Password
@@ -180,11 +204,11 @@ const registerSupplier = async (req, res) => {
 
 const getSuppliersByProduct = async (req, res) => {
   try {
-    const { itemName } = req.body;
-
+    // const { itemName } = req.body;
+   const item = req.query.itemName 
     const suppliers = await Supplier.find({
       productList: {
-        $elemMatch: { name: itemName },
+        $elemMatch: { name: item },
       },
     });
 
@@ -201,8 +225,8 @@ const updateSupplierDetails = async ( request, response ) => {
   const{
     supplierName,
     email,
-    contactNumber,
     location,
+    contactNumber,
     productList
   } = request.body;
 
@@ -220,9 +244,9 @@ const updateSupplierDetails = async ( request, response ) => {
   }
 
   supplier.supplierName = supplierName;
+  supplier.location = location;
   supplier.email = email;
   supplier.contactNumber = contactNumber;
-  supplier.location = location;
   supplier.productList = productList;
 
   const updateSupplier = await supplier.save();
@@ -251,6 +275,7 @@ const deleteSupplier = async ( request, response ) => {
 }
 
 module.exports = {
+  addNewSupplier,
   getSupplierList,
   loginSupplier,
   registerSupplier,

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Box, Button, Grid, MenuItem, Select, TextField, ThemeProvider, Typography, createTheme } from "@mui/material";
+import { Box, Button, Grid, MenuItem, Select, TextField, ThemeProvider, Typography } from "@mui/material";
 import axios from "axios";
 import Container from "@mui/material/Container";
 // import { TextareaAutosize } from '@mui/base/TextareaAutosize';
 import Textarea from '@mui/joy/Textarea';
+import { createTheme } from '@mui/material/styles';
 
 const SupplierReg = () => {
 
@@ -12,14 +13,24 @@ const SupplierReg = () => {
   const navigate = useNavigate();
   const [isSubmiting, setIsSubmiting] = useState(false);
 
+  const theme = createTheme({
+    palette: {
+      primary: { main: "#FFA500" },
+      secondary: { main: "#b36b00" },
+    },
+  });
+
   const [supplierDetails, setSupplierDetails] = useState({
     supplierName: "",
     email: "",
     loction: "",
     contactNumber: "",
     // password: "",
+    addedDate: "",
     productList: "",
   });
+
+  console.log(supplierDetails);
 
   function onChange( event) {
     const { name, value } = event.target;
@@ -29,11 +40,11 @@ const SupplierReg = () => {
     }))
   }
 
-  function createNewSupplier( event ) {
-
-    event.preventDefault();
+  const handleSubmit = async ( event ) => {
+    event?.preventDefault();
+    setIsSubmiting(true);
     axios
-      .post(`http://localhost:8072/suppler/add`, supplierDetails)
+      .post(`http://localhost:8072/supplier/add`, supplierDetails)
       .then(() => {
         alert('Registered Succefully')
         setSupplierDetails({
@@ -42,17 +53,25 @@ const SupplierReg = () => {
           location: "",
           contactNumber: "",
           // password: "",
+          addedDate:"",
           productList: "",
         })
       }).catch(( error ) => {
-        alert('Ann error occured when registering!!')
-        console.log(error);
+        if ( error.response) {
+          console.log("Server responded with status code: " + error.response.status);
+          console.log("Response data:", error.response.data);        
+        }else if (error.request ) {
+          console.log("No response received. The request was made.");
+        } else {
+          console.log("Error setting up the request:", error.message);
+        }
+
       })
-  }
+    }
 
   return (
 
-        <ThemeProvider theme={defaultTheme}>
+      <ThemeProvider theme={theme}>
       <Container
       maxWidth="md"
       sx={{
@@ -64,8 +83,12 @@ const SupplierReg = () => {
             <Box
         sx={{
           display: "flex",
+          backgroundColor: '#FEFEFE',
           flexDirection: "column",
           alignItems: "center",
+          borderRadius: 15,
+          borderColor: '#ED960B',
+          borderWidth: '1rem',
           pt: 10, pl: 10, pr: 10, pb: 10,
         }}
       >
@@ -73,7 +96,7 @@ const SupplierReg = () => {
           Add Suppliers
         </Typography>
 
-        <form onSubmit={createNewSupplier}>
+        <form onSubmit={handleSubmit}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
@@ -84,8 +107,9 @@ const SupplierReg = () => {
                 id="supplierName"
                 label="Full-Name"
                 autoFocus
-                onChange={onChange} 
-                value={supplierDetails.supplierName}               
+                onChange={ ( event ) => {
+                  setSupplierDetails( event.target.value);
+                }}     
               />
             </Grid>
             <Grid item xs={12}>
@@ -98,8 +122,9 @@ const SupplierReg = () => {
                 id="email"
                 label="E-mail"
                 autoFocus
-                onChange={onChange} 
-                value={supplierDetails.email}               
+                onChange={ ( event ) => {
+                  setSupplierDetails( event.target.value );
+                }}            
               />
             </Grid>
             <Grid item xs={12}>
@@ -111,8 +136,9 @@ const SupplierReg = () => {
                 id="location"
                 label="Location"
                 autoFocus
-                onChange={onChange} 
-                value={supplierDetails.loction}               
+                onChange={ ( event ) => {
+                  setSupplierDetails( event.target.value );
+                }}             
               />
             </Grid>
             <Grid item xs={12}>
@@ -124,8 +150,9 @@ const SupplierReg = () => {
                 id="contactNumber"
                 label="Contact Number"
                 autoFocus
-                onChange={onChange} 
-                value={supplierDetails.contactNumber}               
+                onChange={ ( event ) => {
+                  setSupplierDetails( event.target.value );
+                }}            
               />
             </Grid>
             <Grid item xs={12}>
@@ -137,8 +164,9 @@ const SupplierReg = () => {
                 id="productList"
                 label="Add Products"
                 autoFocus
-                onChange={onChange} 
-                value={supplierDetails.productList}             
+                onChange={ ( event ) => {
+                  setSupplierDetails( event.target.value );
+                }}            
               />
             </Grid>
           </Grid>
@@ -147,7 +175,7 @@ const SupplierReg = () => {
             variant="contained"
             color="warning"
             onClick={() => navigate("/")}
-            sx={{ mt: 3, width: '100%' }}
+            sx={{ mt: 3, width: '50%', borderRadius: '1rem', padding:'0.5rem'}}
           >
               Cancel Process
           </Button>
@@ -156,7 +184,7 @@ const SupplierReg = () => {
             variant="contained"
             color="warning"
             // disabled={isSubmiting}
-            sx={{ mt: 3, width: '100%' }}
+            sx={{ mt: 3, width: '50%', borderRadius: '1rem', padding:'0.5rem' }}
           >
             Add Supplier
           </Button>          
