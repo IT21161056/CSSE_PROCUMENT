@@ -61,31 +61,36 @@ const loginSiteManager = async (req, res) => {
       return res.status(400).json({ errors: [{ msg: "Invalid Credentials" }] });
     }
 
-    //match the user email and password
-
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch) {
+    if (user && user.password != password) {
       return res.status(400).json({ errors: [{ msg: "Invalid Credentials" }] });
     }
 
+    //match the user email and password
+
+    // const isMatch = await bcrypt.compare(password, user.password);
+
+    // if (!isMatch) {
+    //   return res.status(400).json({ errors: [{ msg: "Invalid Credentials" }] });
+    // }
+
     //Return jsonwebtoken
 
-    const payload = {
-      user: {
-        id: user.id,
-      },
-    };
+    // const payload = {
+    //   user: {
+    //     id: user.id,
+    //   },
+    // };
 
-    jwt.sign(
-      payload,
-      config.get("jwtSecret"),
-      { expiresIn: 360000 },
-      (err, token) => {
-        if (err) throw err;
-        res.json({ token });
-      }
-    );
+    // jwt.sign(
+    //   payload,
+    //   config.get("jwtSecret"),
+    //   { expiresIn: 360000 },
+    //   (err, token) => {
+    //     if (err) throw err;
+    //     res.json({ token });
+    //   }
+    // );
+    res.send("Successfully logged in");
   } catch (err) {
     //Something wrong with the server
     console.error(err.message);
@@ -96,7 +101,6 @@ const loginSiteManager = async (req, res) => {
 //Register Site Manager
 const registerSiteManager = async (req, res) => {
   const { name, email, password } = req.body;
-
   try {
     //See if user Exist
     let user = await SiteManager.findOne({ email });
