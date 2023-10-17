@@ -5,7 +5,7 @@ const RequestList = require("../models/Request.model");
 const config = require("config");
 
 //get Request List details by id
-const getRequestListDetailsById = async ( request, response ) => {
+const getRequestListDetailsById = async (request, response) => {
   try {
     //get user details
     //-password : dont return the pasword
@@ -18,42 +18,35 @@ const getRequestListDetailsById = async ( request, response ) => {
   }
 };
 
-
-
 //get RequestList List
 const getRequestList = async (request, response) => {
-
   try {
     const requestlists = await RequestList.find().lean();
 
-    if( !requestlists) {
-      return response.status(400).json({ message: 'No request list found!!'})
+    if (!requestlists) {
+      return response.status(400).json({ message: "No request list found!!" });
     }
     response.json(requestlists);
-
-  } catch ( error ) {
-
+  } catch (error) {
     console.log(error.message);
     response.status(500).send("Server Error");
   }
 };
 
 //get single Request List
-const getSingleRequestList = async ( request, response ) => {
+const getSingleRequestList = async (request, response) => {
   const id = request.params.id;
   console.log(`single requestlist id ${id}`);
 
   let singleRequestList;
 
   try {
-    singleRequestList = await RequestList.findOne({ _id: id});
+    singleRequestList = await RequestList.findOne({ _id: id });
     response.status(200).json(singleRequestList);
-  } catch ( error ) {
+  } catch (error) {
     response.status(401).json(error);
   }
-}
-
-
+};
 
 //Add RequestList
 const registerRequestList = async (req, res) => {
@@ -80,7 +73,6 @@ const registerRequestList = async (req, res) => {
       state,
     });
 
-    
     await user.save();
 
     res.json(user);
@@ -91,64 +83,68 @@ const registerRequestList = async (req, res) => {
   }
 };
 
-
-
-const updateRequestListDetails = async ( request, response ) => {
-  const{
-    site,
-    rid,
-    oid,
-    tbudget,
-    abudget,
-    state
-  } = request.body;
+const updateRequestListDetails = async (request, response) => {
+  const { site, rid, oid, tbudget, abudget, state } = request.body;
 
   console.log(request.body);
 
-  if( !site || !rid || !oid || !tbudget || !abudget || !state) {
-    return response.status(400).json({ message: 'All fields are required'});
+  if (!site || !rid || !oid || !tbudget || !abudget || !state) {
+    return response.status(400).json({ message: "All fields are required" });
   }
 
   //confirm RequestList exist to update
-  const requestlist = await RequestList.findById(_id).exec();
+  const requestlists = await RequestList.findById(_id).exec();
 
-  if( !requestlist ) {
-    return response.status(400).json({ message: 'RequestList not found!!'});
+  if (!requestlist) {
+    return response.status(400).json({ message: "RequestList not found!!" });
   }
 
-  requestlist.site = site;
-  requestlist.rid = rid;
-  requestlist.oid = oid;
-  requestlist.tbudget = tbudget;
-  requestlist.abudget = abudget;
-  requestlist.state = state;
+  requestlists.site = site;
+  requestlists.rid = rid;
+  requestlists.oid = oid;
+  requestlists.tbudget = tbudget;
+  requestlists.abudget = abudget;
+  requestlists.state = state;
 
-  const updateRequestList = await requestlist.save();
-  response.json(`'${updateRequestList.requestlist}' updated!`);
-}
+  const updateRequestList = await requestlists.save();
+  response.json(`'${updateRequestList.requestlists}' updated!`);
+};
 
-const deleteRequestList = async ( request, response ) => {
-  try{
+const deleteRequestList = async (request, response) => {
+  try {
     const id = request.params.id;
 
-    await RequestList.findByIdAndDelete( id ) 
-    .then(() => {
-      response.status(200).json({ message: 'Order Deleted'});
-    }).catch(( error ) => {
-
-      //confirm data
-      if( !id ) 
-        return response.status(400).json({ message: 'Order not found!!'})
-      else
-        response.json({ message: 'Error with delete item ', error: error.message});
-      
-    });
-  } catch ( error ) {
-    response.json({ message: error.message});
+    await RequestList.findByIdAndDelete(id)
+      .then(() => {
+        response.status(200).json({ message: "Order Deleted" });
+      })
+      .catch((error) => {
+        //confirm data
+        if (!id)
+          return response.status(400).json({ message: "Order not found!!" });
+        else
+          response.json({
+            message: "Error with delete item ",
+            error: error.message,
+          });
+      });
+  } catch (error) {
+    response.json({ message: error.message });
   }
-}
+};
 
+const requestsBySiteID = async (req, res) => {
+  console.log("site id >>", req.params.id);
+  console.log(req.body);
 
+  const requestList = await RequestList.find({ site: req.params.id }).populate(
+    "site"
+  );
+
+  if (!requestList) return res.json("No requests to this site!");
+
+  res.json(requestList);
+};
 
 module.exports = {
   getRequestListDetailsById,
@@ -156,5 +152,6 @@ module.exports = {
   registerRequestList,
   getSingleRequestList,
   updateRequestListDetails,
-  deleteRequestList
+  deleteRequestList,
+  requestsBySiteID,
 };

@@ -24,7 +24,7 @@ const addOrderBySiteManager = async (req, res) => {
   const isDraft = true;
   const approvalStatus = false;
   const isRestricted = false;
-  const status = totalPrice <= 100000 ? "placed" : "waiting";
+  const status = totalPrice <= 100000 ? "approved" : "waiting";
   const site = await Site.findById(req.params.id);
 
   if (!site) return res.send("Some Data fields are not found!");
@@ -52,7 +52,6 @@ const addOrderBySiteManager = async (req, res) => {
       { $push: { orderList: newOrder._id } },
       { new: true } // This ensures that the updated site document is returned
     );
-
 
     for (let i = 0; i < productList.length; i++) {
       await Supplier.findByIdAndUpdate({
@@ -125,9 +124,47 @@ const getOrderByOrderId = async (req, res) => {
   }
 };
 
+const getOrdersBySite = async (req, res) => {
+  const orders = await Order.find({ site: req.params.id }).populate("site");
+
+  if (!orders) return res.send("No order list to this site!");
+
+  res.json(orders);
+};
+
+const updateOrderStatus = async (req, res) => {
+  try {
+    const { id, status } = req.body;
+
+    console.log("inside order controller >", req.body);
+
+    const existingOrder = await Order.findOne({ _id: id });
+
+    if (!existingOrder) {
+      return res.send("Order not found!");
+    }
+
+    existingOrder.status = status;
+
+    existingOrder
+      .save()
+      .then((res) => {
+        res.json("Update success!");
+      })
+      .catch((error) => {
+        res.json({ message: error.message });
+      });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send("Server Error");
+  }
+};
+
 module.exports = {
   getOrderList,
   addOrderBySiteManager,
   updateOrderBySiteManager,
   getOrderByOrderId,
+  getOrdersBySite,
+  updateOrderStatus,
 };

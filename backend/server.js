@@ -40,7 +40,7 @@ const requestRoutes = require("./routes/request.routes");
 app.use("/requestlist", requestRoutes);
 
 const recommendRoutes = require("./routes/recommend.routes");
-app.use("/recommendlist", recommendRoutes);
+app.use("/recommendsmodel", recommendRoutes);
 
 
 mongoose.connection.once("open", () => {

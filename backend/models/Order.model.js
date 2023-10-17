@@ -39,7 +39,6 @@ const OrderSchema = new Schema({
   status: {
     type: String,
   },
-
   totalPrice: {
     type: Number,
     required: true,

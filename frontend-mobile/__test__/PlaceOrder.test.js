@@ -1,16 +1,30 @@
-import React from 'react';
-import { create } from 'react-test-renderer';
-import { NavigationContainer } from '@react-navigation/native';
-import PlaceOrder from '../screen/PlaceOrder';
+import axios from 'axios';
+import { fetchSiteList } from '../screen/PlaceOrder'; // Adjust the import path accordingly
+import { Ip } from '../Ip';
 
-// Mock NavigationContainer and useNavigation
-jest.mock('@react-navigation/native', () => ({
-  ...jest.requireActual('@react-navigation/native'),
-  useNavigation: jest.fn(),
-}));
+jest.mock('axios');
 
-const tree = create(<NavigationContainer><PlaceOrder /></NavigationContainer>);
+describe('fetchSiteList', () => {
+    it('should fetch site list successfully', async () => {
+        const mockData = [{ id: 1, name: 'Site 1' }];
+        axios.get.mockResolvedValueOnce({ data: mockData });
 
-test('snapshot', () => {
-  expect(tree).toMatchSnapshot();
+        const result = await fetchSiteList();
+
+        expect(result).toEqual(mockData);
+        expect(axios.get).toHaveBeenCalledWith(`http://${Ip}:8072/site/`);
+    });
+
+    it('should handle error during site list fetch', async () => {
+        const errorMessage = 'Failed to fetch site list';
+        axios.get.mockRejectedValueOnce(new Error(errorMessage));
+
+        try {
+            await fetchSiteList();
+        } catch (error) {
+            expect(error.message).toBe(errorMessage);
+        }
+
+        expect(axios.get).toHaveBeenCalledWith(`http://${Ip}:8072/site/`);
+    });
 });

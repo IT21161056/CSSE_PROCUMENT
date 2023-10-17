@@ -1,208 +1,296 @@
-import React, { useEffect, useState } from 'react'
-import axios from 'axios';
-import { Button, 
-    Grid, 
-    IconButton, 
-    InputAdornment, 
-    TextField, 
-    Typography,
-    TableRow,
-    Paper,
-    Modal,
-    Box,
-    FormControl,
-    InputLabel
-} from '@mui/material';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import SearchIcon from '@mui/icons-material/Search';
-import jsPDF from 'jspdf';
-import EditNoteIcon from '@mui/icons-material/EditNote';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import {
+  Button,
+  IconButton,
+  Modal,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  Typography,
+  FormControl,
+} from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import SettingsIcon from "@mui/icons-material/Settings";
+import axios from "axios";
+import Recommends from "./Recommends";
+import { useParams } from "react-router-dom";
+import styled from "styled-components";
 
-const Requests = () => {
+const StyledContainer = styled("div")`
+  height: 100vh;
+  width: 100%;
+`;
 
-    const [requestlists, setRequestLists] = useState([]);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [open, setOpen] = React.useState(false);
-     const [description, setDescription] = useState("");
+const TopBarContainer = styled("div")`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 100px;
+`;
 
-    const handleClose = () => {
-      setOpen(false);
-      setDescription("");
-    };
+const StatusTag = styled("div")`
+  width: 70px;
+  text-align: center;
+  color: ${(props) =>
+    props.color == "declined"
+      ? "#ff4d4f"
+      : props.color == "waiting"
+      ? "#faad14"
+      : "#52c41a"};
+  padding: 2px 4px;
 
-    let navigate = useNavigate();
-    const routeChange = () => {
-      let path = `/recommends`;
-      navigate(path);
-    };
+  border-radius: 4px;
+  background-color: ${(props) =>
+    props.color == "declined"
+      ? "#fff2f0"
+      : props.color == "waiting"
+      ? "#fffbe6"
+      : "#f6ffed"};
 
-    const getOrderId = (requestlist) => {
-      setOpen(true);
-      setRequestLists({
-        id: requestlists._id,
+  border-color: ${(props) =>
+    props.color == "declined"
+      ? "#ff4d4f"
+      : props.color == "waiting"
+      ? "#faad14"
+      : "#52c41a"};
+  border-width: 1px;
+  border-style: solid;
+`;
+
+export default function Requests() {
+  const siteID = useParams();
+
+  const [orders, setOrders] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [openModal, setOpenModal] = useState(false);
+  const [modalData, setModalData] = useState({
+    requestId: "",
+    orderId: "",
+    description: "",
+  });
+
+  useEffect(() => {
+    // Fetch orders data when the component mounts
+    axios
+      .get("http://localhost:8072/order/bySiteId/" + siteID.id)
+      .then((res) => {
+        setOrders(res.data);
+        console.log(res.data);
       });
+  }, []);
+
+  const handleOpenModal = (order) => {
+    setModalData({
+      orderId: order._id,
+      description: "",
+    });
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
+
+  // const handleSaveRecommendation = () => {
+  //   // Save the recommendation data to the database and handle the logic here
+  //   // Use axios.post to send the data to your backend API
+  //   axios
+  //     .post("http://localhost:8072/recommend/add", {
+  //       requestId: modalData.requestId,
+  //       orderId: modalData.orderId,
+  //       description: modalData.description,
+  //     })
+  //     .then((res) => {
+  //       // Recommendation saved successfully
+  //       console.log(res.data);
+  //       // Close the modal
+  //       setOpenModal(false);
+  //       // You can handle any additional logic here, e.g., displaying a success message
+  //     })
+  //     .catch((error) => {
+  //       // Handle the error, e.g., display an error message
+  //       console.error(error);
+  //     });
+  // };
+
+  const reFetchOrderList = () => {
+    axios
+      .get("http://localhost:8072/order/bySiteId/" + siteID.id)
+      .then((res) => {
+        setOrders(res.data);
+      });
+  };
+
+  const handleSave = () => {
+    const dataToSave = {
+      orderId: modalData.orderId,
+      description: modalData.description,
     };
 
-    useEffect(() => {
-   
-        function fetchRequestListData() {
-        axios
-            .get('http://localhost:8072/requestlist/')
-            .then(( response ) => {
-            console.log(response.data)
-            setRequestLists(response.data);
-            }).catch(( error ) => {
-            alert("An error occures when fecthing request data!!");
-            console.log(error);
-            });
-        }
-        fetchRequestListData();
-    }, [])
+    // Send a POST request to save the data to the backend
+    axios
+      .post("http://localhost:8072/recommendsmodel/add", dataToSave)
+      .then((response) => {
+        // Data has been successfully saved
+        console.log("Data saved:", response.data);
 
-        const filterOrders = requestlists.filter(( item ) => {
-        const { rid } = item;
-        const lowerCaseQuery = searchQuery.toLowerCase();
+        // Open the RecommendationsTable by setting openModal to true
+        setOpenModal(true);
+      })
+      .catch((error) => {
+        // Handle any error that occurs while saving the data
+        console.error("Error saving data:", error);
+      });
+    console.log("update status");
+    axios
+      .put("http://localhost:8072/order/updateStatus", {
+        id: modalData.orderId,
+        status: "declined",
+      })
+      .then((res) => {
+        reFetchOrderList();
+        setModalData({ requestId: "", orderId: "", description: "" });
+        openModal(true);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
-        return(
-            rid.toLowerCase().includes(lowerCaseQuery)
-        );
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setModalData({
+      ...modalData,
+      [name]: value,
     });
+  };
 
-    const generateReport = (orders) => {
-        const doc = new jsPDF();
-    
+  // Filter orders based on search query
+  // const filteredOrders = orders.filter((order) => {
+  //   const { site, rid, oid, tbudget, abudget, state } = order;
+  //   const lowerCaseQuery = searchQuery.toLowerCase();
 
-    const columns = [
-      { title: "Request ID", dataKey: "rid" },
-      { title: "Order ID", dataKey: "oid" },
-      { title: "Total Budget", dataKey: "tbudget" },
-      { title: "Allocated Budget", dataKey: "abudget" },
-      { title: "Budget Status", dataKey: "state" },
-    ];
+  //   return (
+  //     site.toLowerCase().includes(lowerCaseQuery) ||
+  //     rid.toLowerCase().includes(lowerCaseQuery) ||
+  //     oid.toLowerCase().includes(lowerCaseQuery) ||
+  //     tbudget.toString().includes(lowerCaseQuery) ||
+  //     abudget.toString().includes(lowerCaseQuery) ||
+  //     state.toLowerCase().includes(lowerCaseQuery)
+  //   );
+  // });
 
-    const data = orders.map (( order ) => ({
-        rid: order.rid,
-        oid: order.oid,
-        state: order.state
-    }));
+  const approveOrder = (orderID) => {
+    axios
+      .put("http://localhost:8072/order/updateStatus", {
+        id: orderID,
+        status: "approved",
+      })
+      .then((res) => {
+        reFetchOrderList();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
-    doc.autoTableSetDefaults({
-      startY: 20,
-      margin: { top: 20},
-      headStyles: { fillColor: [41, 128, 185], textColor: 255 },
-      bodyStyles: { textColor: 0 },
-    });
-
-    doc.autoTable(columns, data);
-
-    doc.save('request_report.pdf');
-    };  
   return (
-    <Grid
-      container
-      spacing={2}
-      sx={{ alignItems: "flex-start", marginTop: "1rem" }}
-    >
-      <Grid item xs={12} sm={6} sx={{ textAlign: "center" }}>
-        <Typography
-          sx={{
-            fontSize: "32px",
-            fontWeight: 600,
-          }}
-        >
-          Order Requests
-        </Typography>
-      </Grid>
-      <Grid item xs={12} sm={6} sx={{ textAlign: "center" }}>
-        <Button
-          variant="contained"
-          color="warning"
-          onClick={() => {
-            generateReport(filterOrders);
-          }}
-        >
-          Generate Report
-        </Button>
-      </Grid>
+    <StyledContainer>
+      <TopBarContainer>
+        <Typography variant="h4">Order List</Typography>
+        <Button variant="contained">Rejected orders</Button>
+      </TopBarContainer>
+
       <TextField
         label="Search"
         variant="outlined"
+        fullWidth
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        sx={{
-          width: "50%",
-          marginTop: "2rem",
-          marginRight: "2rem",
-          marginLeft: "2rem",
-        }}
         InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchIcon />
-            </InputAdornment>
-          ),
+          startAdornment: <SearchIcon />,
         }}
+        sx={{ marginTop: 2, marginBottom: 2 }}
       />
 
-      <TableContainer
-        sx={{
-          maxHeight: "70vh",
-          padding: 1,
-          margin: "1rem",
-          alignItems: "center",
-          justifyContent: "center",
-          display: "flex",
-        }}
-      >
+      <TableContainer component={Paper}>
         <Table>
-          <TableHead sx={{ backgroundColor: "#FF9933" }}>
+          <TableHead>
             <TableRow>
+              <TableCell>Site Name</TableCell>
               <TableCell>Request ID</TableCell>
-              <TableCell>Order ID</TableCell>
-              <TableCell>Total Budget(LKR)</TableCell>
-              <TableCell>Allocated Budget(LKR)</TableCell>
-              <TableCell>Budget Status</TableCell>
+              <TableCell>Total Budget</TableCell>
+              <TableCell>Allocated Budget</TableCell>
+              <TableCell>Status</TableCell>
               <TableCell>Action</TableCell>
             </TableRow>
           </TableHead>
-
           <TableBody>
-            {filterOrders.map((item) => {
-              return (
-                <TableRow key={item._id}>
-                  <TableCell>{item.rid}</TableCell>
-                  <TableCell>{item.oid}</TableCell>
-                  <TableCell>{item.tbudget}</TableCell>
-                  <TableCell>{item.abudget}</TableCell>
-                  <TableCell>{item.state}</TableCell>
-                  <TableCell>
-                    <Button
-                      onClick={routeChange}
-                      variant="contained"
-                      color="error"
-                      size="small"
-                      sx={{ marginRight: "8px" }}
-                    >
-                      Decline
-                    </Button>
-                    <Button variant="contained" color="warning" size="small">
-                      Approve
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
+            {orders.map((order) => (
+              <TableRow key={order._id}>
+                <TableCell>{order.site.siteName}</TableCell>
+                <TableCell>S{order._id.slice(0, 4)}</TableCell>
+
+                <TableCell>{order.totalPrice}</TableCell>
+                <TableCell>{order.site.allocatedBudget}</TableCell>
+                <TableCell>
+                  <StatusTag color={`${order.status}`}>
+                    {order.status}
+                  </StatusTag>
+                </TableCell>
+                <TableCell>
+                  <Button onClick={() => approveOrder(order._id)}>
+                    Approve
+                  </Button>
+                  <Button onClick={() => handleOpenModal(order)}>
+                    Decline
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </TableContainer>
-    </Grid>
+
+      <Modal open={openModal} onClose={handleCloseModal}>
+        <Paper
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            padding: 2,
+          }}
+        >
+          <Typography variant="h6">Recommendation Details</Typography>
+
+          <TextField
+            name="orderId"
+            fullWidth
+            value={modalData.orderId}
+            disabled
+            sx={{ marginBottom: 2 }}
+          />
+          <TextField
+            label="Description"
+            name="description"
+            fullWidth
+            multiline
+            rows={4}
+            value={modalData.description}
+            sx={{ marginBottom: 2 }}
+            onChange={handleInputChange}
+          />
+          <button onClick={handleSave}>Save Data</button>
+        </Paper>
+      </Modal>
+    </StyledContainer>
   );
 }
-
-export default Requests

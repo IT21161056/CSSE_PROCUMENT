@@ -1,59 +1,52 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import styles from "styled-components";
-import axios from 'axios';
-
+import axios from "axios";
 
 const ReportList = () => {
   const [sites, setSites] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
- 
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-   
     function fetchSiteData() {
-    axios
-        .get('http://localhost:8072/site/')
-        .then(( response ) => {
-        console.log(response.data)
-        setSites(response.data);
-        }).catch(( error ) => {
-        alert("An error occures when fecthing supplier data!!");
-        console.log(error);
+      axios
+        .get("http://localhost:8072/site/")
+        .then((response) => {
+          console.log(response.data);
+          setSites(response.data);
+        })
+        .catch((error) => {
+          alert("An error occures when fecthing supplier data!!");
+          console.log(error);
         });
     }
     fetchSiteData();
-}, [])
+  }, []);
 
-    const filterOrders = sites.filter(( item ) => {
+  const filterOrders = sites.filter((item) => {
     const { siteName } = item;
     const lowerCaseQuery = searchQuery.toLowerCase();
 
-    return(
-        siteName.toLowerCase().includes(lowerCaseQuery)
-    );
-});
-
-
-  
+    return siteName.toLowerCase().includes(lowerCaseQuery);
+  });
 
   return (
     <div>
-      <center><Topic>Order Reports</Topic></center>
+      <center>
+        <Topic>Order Reports</Topic>
+      </center>
 
       <ListContainer>
         {filterOrders.map((item) => (
           <ListContainerRow key={item.siteName}>
             <Text>{item.siteName}</Text>
             <Text>
-              <ViewBtn >
-              <LinkTo href = "/requestlists">View</LinkTo>
+              <ViewBtn>
+                <LinkTo href={`/requestlists/${item._id}`}>View</LinkTo>
               </ViewBtn>
             </Text>
           </ListContainerRow>
         ))}
       </ListContainer>
-
-      
     </div>
   );
 };
