@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import AddSupplier from '../pages/AddSupplier';
 
+
 test('renders the Add Suppliers component', () => {
   render(<AddSupplier />);
   const heading = screen.getByText('Add Suppliers');
