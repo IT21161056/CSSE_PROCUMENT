@@ -1,208 +1,209 @@
-import React, { useEffect, useState } from 'react'
-import axios from 'axios';
-import { Button, 
-    Grid, 
-    IconButton, 
-    InputAdornment, 
-    TextField, 
-    Typography,
-    TableRow,
-    Paper,
-    Modal,
-    Box,
-    FormControl,
-    InputLabel
-} from '@mui/material';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import SearchIcon from '@mui/icons-material/Search';
-import jsPDF from 'jspdf';
-import EditNoteIcon from '@mui/icons-material/EditNote';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import {
+  Button,
+  IconButton,
+  Modal,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  Typography,
+  FormControl,
+} from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import SettingsIcon from "@mui/icons-material/Settings";
+import axios from "axios";
+import Recommends from "./Recommends";
 
-const Requests = () => {
+export default function Requests() {
+  const [orders, setOrders] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [openModal, setOpenModal] = useState(false);
+  const [modalData, setModalData] = useState({
+    requestId: "",
+    orderId: "",
+    description: "",
+  });
 
-    const [requestlists, setRequestLists] = useState([]);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [open, setOpen] = React.useState(false);
-     const [description, setDescription] = useState("");
+  useEffect(() => {
+    // Fetch orders data when the component mounts
+    axios.get("http://localhost:8072/requestlist/").then((res) => {
+      setOrders(res.data);
+    });
+  }, []);
 
-    const handleClose = () => {
-      setOpen(false);
-      setDescription("");
+  const handleOpenModal = (order) => {
+    setModalData({
+      requestId: order.rid,
+      orderId: order.oid,
+      description: "",
+    });
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
+
+  // const handleSaveRecommendation = () => {
+  //   // Save the recommendation data to the database and handle the logic here
+  //   // Use axios.post to send the data to your backend API
+  //   axios
+  //     .post("http://localhost:8072/recommend/add", {
+  //       requestId: modalData.requestId,
+  //       orderId: modalData.orderId,
+  //       description: modalData.description,
+  //     })
+  //     .then((res) => {
+  //       // Recommendation saved successfully
+  //       console.log(res.data);
+  //       // Close the modal
+  //       setOpenModal(false);
+  //       // You can handle any additional logic here, e.g., displaying a success message
+  //     })
+  //     .catch((error) => {
+  //       // Handle the error, e.g., display an error message
+  //       console.error(error);
+  //     });
+  // };
+
+  const handleSave = () => {
+    const dataToSave = {
+      requestId: modalData.requestId,
+      orderId: modalData.orderId,
+      description: modalData.description, 
     };
 
-    let navigate = useNavigate();
-    const routeChange = () => {
-      let path = `/recommends`;
-      navigate(path);
-    };
+    // Send a POST request to save the data to the backend
+    axios
+      .post("http://localhost:8072/recommendsmodel/add", dataToSave)
+      .then((response) => {
+        // Data has been successfully saved
+        console.log("Data saved:", response.data);
 
-    const getOrderId = (requestlist) => {
-      setOpen(true);
-      setRequestLists({
-        id: requestlists._id,
+        // Open the RecommendationsTable by setting openModal to true
+        setOpenModal(true);
+      })
+      .catch((error) => {
+        // Handle any error that occurs while saving the data
+        console.error("Error saving data:", error);
       });
-    };
+  };
 
-    useEffect(() => {
-   
-        function fetchRequestListData() {
-        axios
-            .get('http://localhost:8072/requestlist/')
-            .then(( response ) => {
-            console.log(response.data)
-            setRequestLists(response.data);
-            }).catch(( error ) => {
-            alert("An error occures when fecthing request data!!");
-            console.log(error);
-            });
-        }
-        fetchRequestListData();
-    }, [])
-
-        const filterOrders = requestlists.filter(( item ) => {
-        const { rid } = item;
-        const lowerCaseQuery = searchQuery.toLowerCase();
-
-        return(
-            rid.toLowerCase().includes(lowerCaseQuery)
-        );
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setModalData({
+      ...modalData,
+      [name]: value,
     });
+  };
 
-    const generateReport = (orders) => {
-        const doc = new jsPDF();
-    
+  // Filter orders based on search query
+  const filteredOrders = orders.filter((order) => {
+    const { site, rid, oid, tbudget, abudget, state } = order;
+    const lowerCaseQuery = searchQuery.toLowerCase();
 
-    const columns = [
-      { title: "Request ID", dataKey: "rid" },
-      { title: "Order ID", dataKey: "oid" },
-      { title: "Total Budget", dataKey: "tbudget" },
-      { title: "Allocated Budget", dataKey: "abudget" },
-      { title: "Budget Status", dataKey: "state" },
-    ];
+    return (
+      site.toLowerCase().includes(lowerCaseQuery) ||
+      rid.toLowerCase().includes(lowerCaseQuery) ||
+      oid.toLowerCase().includes(lowerCaseQuery) ||
+      tbudget.toString().includes(lowerCaseQuery) ||
+      abudget.toString().includes(lowerCaseQuery) ||
+      state.toLowerCase().includes(lowerCaseQuery)
+    );
+  });
 
-    const data = orders.map (( order ) => ({
-        rid: order.rid,
-        oid: order.oid,
-        state: order.state
-    }));
-
-    doc.autoTableSetDefaults({
-      startY: 20,
-      margin: { top: 20},
-      headStyles: { fillColor: [41, 128, 185], textColor: 255 },
-      bodyStyles: { textColor: 0 },
-    });
-
-    doc.autoTable(columns, data);
-
-    doc.save('request_report.pdf');
-    };  
   return (
-    <Grid
-      container
-      spacing={2}
-      sx={{ alignItems: "flex-start", marginTop: "1rem" }}
-    >
-      <Grid item xs={12} sm={6} sx={{ textAlign: "center" }}>
-        <Typography
-          sx={{
-            fontSize: "32px",
-            fontWeight: 600,
-          }}
-        >
-          Order Requests
-        </Typography>
-      </Grid>
-      <Grid item xs={12} sm={6} sx={{ textAlign: "center" }}>
-        <Button
-          variant="contained"
-          color="warning"
-          onClick={() => {
-            generateReport(filterOrders);
-          }}
-        >
-          Generate Report
-        </Button>
-      </Grid>
+    <>
+      <Typography variant="h4">Order List</Typography>
       <TextField
         label="Search"
         variant="outlined"
+        fullWidth
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        sx={{
-          width: "50%",
-          marginTop: "2rem",
-          marginRight: "2rem",
-          marginLeft: "2rem",
-        }}
         InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchIcon />
-            </InputAdornment>
-          ),
+          startAdornment: <SearchIcon />,
         }}
+        sx={{ marginTop: 2, marginBottom: 2 }}
       />
-
-      <TableContainer
-        sx={{
-          maxHeight: "70vh",
-          padding: 1,
-          margin: "1rem",
-          alignItems: "center",
-          justifyContent: "center",
-          display: "flex",
-        }}
-      >
+      <TableContainer component={Paper}>
         <Table>
-          <TableHead sx={{ backgroundColor: "#FF9933" }}>
+          <TableHead>
             <TableRow>
+              <TableCell>Site Name</TableCell>
               <TableCell>Request ID</TableCell>
               <TableCell>Order ID</TableCell>
-              <TableCell>Total Budget(LKR)</TableCell>
-              <TableCell>Allocated Budget(LKR)</TableCell>
-              <TableCell>Budget Status</TableCell>
+              <TableCell>Total Budget</TableCell>
+              <TableCell>Allocated Budget</TableCell>
+              <TableCell>Status</TableCell>
               <TableCell>Action</TableCell>
             </TableRow>
           </TableHead>
-
           <TableBody>
-            {filterOrders.map((item) => {
-              return (
-                <TableRow key={item._id}>
-                  <TableCell>{item.rid}</TableCell>
-                  <TableCell>{item.oid}</TableCell>
-                  <TableCell>{item.tbudget}</TableCell>
-                  <TableCell>{item.abudget}</TableCell>
-                  <TableCell>{item.state}</TableCell>
-                  <TableCell>
-                    <Button
-                      onClick={routeChange}
-                      variant="contained"
-                      color="error"
-                      size="small"
-                      sx={{ marginRight: "8px" }}
-                    >
-                      Decline
-                    </Button>
-                    <Button variant="contained" color="warning" size="small">
-                      Approve
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
+            {filteredOrders.map((order) => (
+              <TableRow key={order._id}>
+                <TableCell>{order.site}</TableCell>
+                <TableCell>{order.rid}</TableCell>
+                <TableCell>{order.oid}</TableCell>
+                <TableCell>{order.tbudget}</TableCell>
+                <TableCell>{order.abudget}</TableCell>
+                <TableCell>{order.state}</TableCell>
+                <TableCell>
+                  <IconButton onClick={() => handleOpenModal(order)}>
+                    <SettingsIcon />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </TableContainer>
-    </Grid>
+      <Modal open={openModal} onClose={handleCloseModal}>
+        <Paper
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            padding: 2,
+          }}
+        >
+          <Typography variant="h6">Recommendation Details</Typography>
+          <TextField
+            label="Request ID"
+            name="requestId"
+            fullWidth
+            value={modalData.requestId}
+            disabled
+            sx={{ marginBottom: 2 }}
+          />
+          <TextField
+            label="Order ID"
+            name="orderId"
+            fullWidth
+            value={modalData.orderId}
+            disabled
+            sx={{ marginBottom: 2 }}
+          />
+          <TextField
+            label="Description"
+            name="description"
+            fullWidth
+            multiline
+            rows={4}
+            value={modalData.description}
+            onChange={handleInputChange}
+            sx={{ marginBottom: 2 }}
+          />
+          <button onClick={handleSave}>Save Data</button>
+          {openModal && <Recommends />}
+        </Paper>
+      </Modal>
+    </>
   );
 }
-
-export default Requests

@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const {
-  getRecommendById,
+  getRecommendDetailsById,
   getRecommend,
   registerRecommend,
   getSingleRecommend,
@@ -10,11 +10,12 @@ const {
   deleteRecommend,
 } = require("../controllers/recommends.controller");
 
-router.post("/",registerRecommend);
+router.post("/add",registerRecommend);
 router.get("/", getRecommend);
-router.put("/updateRequestList",updateRecommend);
-router.delete("/deleteRequestList/:id", deleteRecommend);
-router.get("/byId/:id", getRecommendById);
+router.put("/updateRecommend",updateRecommend);
+router.delete("/deleteRecommend/:id", deleteRecommend);
+router.get("/byId/:id", getRecommendDetailsById);
+router.get("/recommend/id", getSingleRecommend)
 
 
 
