@@ -21,7 +21,9 @@ const getRecommend = async (request, response) => {
     const recommendsmodels = await RecommendsModel.find().lean();
 
     if (!recommendsmodels) {
-      return response.status(400).json({ message: "No recommended change found!!" });
+      return response
+        .status(400)
+        .json({ message: "No recommended change found!!" });
     }
     response.json(recommendsmodels);
   } catch (error) {
@@ -47,13 +49,12 @@ const getSingleRecommend = async (request, response) => {
 
 // Add Recommend
 const registerRecommend = async (req, res) => {
-  const { requestId, orderId, description} = req.body;
+  const { orderId, description } = req.body;
 
   console.log(req.body);
   try {
     //create a Recommand instance
     user = new RecommendsModel({
-      requestId,
       orderId,
       description,
     });
@@ -76,7 +77,7 @@ const registerRecommend = async (req, res) => {
 //   if (
 //     !requestId ||
 //     !orderId ||
-//     !description 
+//     !description
 //   ) {
 //     return response.status(400).json({ message: "All fields are required" });
 //   }
@@ -132,7 +133,9 @@ const deleteRecommend = async (request, response) => {
       .catch((error) => {
         //confirm data
         if (!id)
-          return response.status(400).json({ message: "Recommend not found!!" });
+          return response
+            .status(400)
+            .json({ message: "Recommend not found!!" });
         else
           response.json({
             message: "Error with delete item ",

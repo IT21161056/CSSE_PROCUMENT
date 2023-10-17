@@ -6,16 +6,15 @@ const {
   registerRequestList,
   getRequestListDetailsById,
   updateRequestListDetails,
-  deleteRequestList
+  deleteRequestList,
+  requestsBySiteID,
 } = require("../controllers/request.controller");
 
 router.post("/", registerRequestList);
 router.get("/", getRequestList);
-router.put("/updateRequestList",updateRequestListDetails);
+router.put("/updateRequestList", updateRequestListDetails);
 router.delete("/deleteRequestList/:id", deleteRequestList);
 router.get("/byId/:id", getRequestListDetailsById);
-
-
+router.get("/bySiteId/:id", requestsBySiteID);
 
 module.exports = router;
-
