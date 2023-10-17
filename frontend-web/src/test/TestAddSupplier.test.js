@@ -8,11 +8,12 @@ test('renders the Add Suppliers component', () => {
   expect(heading).toBeInTheDocument();
 });
 
+//unit test
 test('allows the user to enter supplierName', () => {
   render(<AddSupplier />);
   const supplierNameInput = screen.getByLabelText('Full-Name');
-  fireEvent.change(supplierNameInput, { target: { value: 'John Doe' } });
-  expect(supplierNameInput.value).toBe('John Doe');
+  fireEvent.change(supplierNameInput, { target: { value: 'John Smith' } });
+  expect(supplierNameInput.value).toBe('John Smith');
 });
 
 test('submits the form with correct data', async () => {

@@ -51,8 +51,8 @@
     "jest": "^27.5.1"
   },
   "jest": {
-    "transform": {
-      "^.+\\.(js|jsx)$": "babel-jest"
-    }
-  }
+  "config": "./jest.config.js"
+  },
+  "test": "node --experimental-vm-modules node_modules/.bin/jest"
+
 }
