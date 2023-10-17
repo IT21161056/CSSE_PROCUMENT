@@ -5,6 +5,7 @@ import axios from 'axios';
 
 jest.mock('axios');
 
+/*Test case for handle invalid login*/
 describe('LoginScreen component', () => {
   it('handles failed login', async () => {
     // Mock the failed login response

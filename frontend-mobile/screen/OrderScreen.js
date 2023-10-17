@@ -43,7 +43,7 @@ const OrderScreen = () => {
               <Text >{`Required Date: ${orderItem.requiredDate}`}</Text>
               <Text >{`Site Name: ${orderItem.siteName}`}</Text>
               <Text style={styles.total}>{`Order Cost:  Rs. ${orderItem.totalPrice}.00`}</Text>
-              <Text style={orderItem.status === 'waiting' ? styles.yellow : styles.green}>{`${orderItem.status}`}</Text>{/*if order greater 
+              <Text style={orderItem.status === 'waiting' ?  styles.yellow : orderItem.status === "declined" ? styles.approved: styles.green}>{`${orderItem.status}`}</Text>{/*if order greater 
               than 100000 show waiting and if less tha show placed label*/}
             </View>
           </View>
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   green: {
-    backgroundColor: '#00e600',
+    backgroundColor: '#52c41a',
     position: 'absolute',
     left: 210,
     bottom: 1,
@@ -102,7 +102,18 @@ const styles = StyleSheet.create({
     fontSize: 15
   },
   yellow: {
-    backgroundColor: '#ffb366',
+    backgroundColor: '#faad14',
+    position: 'absolute',
+    left: 210,
+    bottom: 1,
+    borderRadius: 8,
+    padding: 5,
+    paddingLeft: 10,
+    paddingRight: 10,
+    fontSize: 15
+  },
+  approved: {
+    backgroundColor: '#ff4d4f',
     position: 'absolute',
     left: 210,
     bottom: 1,
