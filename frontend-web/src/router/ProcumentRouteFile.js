@@ -2,13 +2,14 @@ import React from 'react'
 import { Routes, Route } from 'react-router-dom';
 import SupplierList from '../pages/SupplierList';
 import UpdateSupplier from '../pages/UpdateSupplier';
-import SupplierReg from '../pages/SupplierReg';
+//import SupplierReg from '../pages/SupplierReg';
 import ReportList from '../pages/ReportList';
 import Requests from '../pages/Requests';
 import Recommends from '../pages/Recommends';
 import RecommendList from '../pages/RecommendList';
 import UpdateRecommends from '../pages/UpdateRecommends';
 import DashBoard from '../pages/DashBoard';
+//import ProductDetails from '../pages/'
 
 const RouteFile = () => {
   return (
@@ -16,8 +17,8 @@ const RouteFile = () => {
         <Route path="/dashboard" element={<DashBoard/>}/>
         <Route path="/dashboard/allSuppliers" element={<SupplierList/>}/>
         <Route path='/dashboard/updateSupplier/:id' element={<UpdateSupplier/>}/>
-        <Route path='/dashboard/addSupplier' element={<SupplierReg/>}/>
-        <Route path="/product" element={<ProductDetails/>}/>
+        {/* <Route path='/dashboard/addSupplier' element={<SupplierReg/>}/> */}
+        {/* <Route path="/product" element={<ProductDetails/>}/> */}
 
 
         <Route path="/reportlist" element={<ReportList />}></Route>

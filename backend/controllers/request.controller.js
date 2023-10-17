@@ -110,21 +110,21 @@ const updateRequestListDetails = async ( request, response ) => {
   }
 
   //confirm RequestList exist to update
-  const requestlist = await RequestList.findById(_id).exec();
+  const requestlists = await RequestList.findById(_id).exec();
 
   if( !requestlist ) {
     return response.status(400).json({ message: 'RequestList not found!!'});
   }
 
-  requestlist.site = site;
-  requestlist.rid = rid;
-  requestlist.oid = oid;
-  requestlist.tbudget = tbudget;
-  requestlist.abudget = abudget;
-  requestlist.state = state;
+  requestlists.site = site;
+  requestlists.rid = rid;
+  requestlists.oid = oid;
+  requestlists.tbudget = tbudget;
+  requestlists.abudget = abudget;
+  requestlists.state = state;
 
-  const updateRequestList = await requestlist.save();
-  response.json(`'${updateRequestList.requestlist}' updated!`);
+  const updateRequestList = await requestlists.save();
+  response.json(`'${updateRequestList.requestlists}' updated!`);
 }
 
 const deleteRequestList = async ( request, response ) => {
