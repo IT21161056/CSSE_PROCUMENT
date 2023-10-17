@@ -49,7 +49,7 @@ const AddSupplier = () => {
   }
 
   const handleSubmit = async ( event ) => {
-    event?.preventDefault();
+    // event?.preventDefault();
     setIsSubmiting(true);
     axios
       .post(`http://localhost:8072/supplier/add`, supplierDetails)
@@ -176,6 +176,9 @@ const AddSupplier = () => {
                       id="contactNumber"
                       label="Contact Number"
                       autoFocus
+                      inputProps={{
+                        pattern: "[0-9]{10}",
+                      }}
                       onChange={( event ) => 
                         setSupplierDetails(( prev ) => ({
                           ...prev,
