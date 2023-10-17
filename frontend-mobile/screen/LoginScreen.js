@@ -8,6 +8,7 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { Ip } from "../Ip";
 
@@ -19,8 +20,7 @@ export default function LoginScreen() {
   });
 
   const login = async () => {
-    console.log(credentials);
-    await axios
+      await axios
       .post(`http://${Ip}:8072/siteManager/login`, credentials)
       .then((res) => {
         setCredentials({
@@ -28,9 +28,10 @@ export default function LoginScreen() {
           password: "",
         });
         navigation.navigate("Tabs");
+        Alert.alert("Login success")
       })
       .catch((error) => {
-        console.log(error);
+        Alert.alert("Please insert credentials")
       });
   };
   return (
