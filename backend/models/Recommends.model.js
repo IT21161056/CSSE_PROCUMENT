@@ -2,10 +2,6 @@ const mongoose = require("mongoose");
 
 const recommendsSchema = new mongoose.Schema(
   {
-    requestId: {
-      type: String,
-      required: true,
-    },
     orderId: {
       type: String,
     },

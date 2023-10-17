@@ -24,7 +24,7 @@ const RouteFile = () => {
       <Route path="/dashboard/addSupplier" element={<AddSupplier />} />
 
       <Route path="/reportlist" element={<ReportList />}></Route>
-      <Route path="/requestlists" element={<Requests />}></Route>
+      <Route path="/requestlists/:id" element={<Requests />}></Route>
       <Route path="/recommends" element={<Recommends />}></Route>
       <Route path="/recommendlist" element={<RecommendList />}></Route>
       <Route path="/updaterecommendst" element={<UpdateRecommends />}></Route>

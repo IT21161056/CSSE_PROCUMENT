@@ -18,8 +18,55 @@ import SearchIcon from "@mui/icons-material/Search";
 import SettingsIcon from "@mui/icons-material/Settings";
 import axios from "axios";
 import Recommends from "./Recommends";
+import { useParams } from "react-router-dom";
+import styled from "styled-components";
+
+const StyledContainer = styled("div")`
+  height: 100vh;
+  width: 100%;
+`;
+
+const TopBarContainer = styled("div")`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 100px;
+`;
+
+const StatusTag = styled("div")`
+  width: 70px;
+  text-align: center;
+  color: ${(props) =>
+    props.color == "declined"
+      ? "#ff4d4f"
+      : props.color == "waiting"
+      ? "#faad14"
+      : "#52c41a"};
+  padding: 2px 4px;
+
+  border-radius: 4px;
+  background-color: ${(props) =>
+    props.color == "declined"
+      ? "#fff2f0"
+      : props.color == "waiting"
+      ? "#fffbe6"
+      : "#f6ffed"};
+
+  border-color: ${(props) =>
+    props.color == "declined"
+      ? "#ff4d4f"
+      : props.color == "waiting"
+      ? "#faad14"
+      : "#52c41a"};
+  border-width: 1px;
+  border-style: solid;
+`;
 
 export default function Requests() {
+  const siteID = useParams();
+
   const [orders, setOrders] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [openModal, setOpenModal] = useState(false);
@@ -31,15 +78,17 @@ export default function Requests() {
 
   useEffect(() => {
     // Fetch orders data when the component mounts
-    axios.get("http://localhost:8072/requestlist/").then((res) => {
-      setOrders(res.data);
-    });
+    axios
+      .get("http://localhost:8072/order/bySiteId/" + siteID.id)
+      .then((res) => {
+        setOrders(res.data);
+        console.log(res.data);
+      });
   }, []);
 
   const handleOpenModal = (order) => {
     setModalData({
-      requestId: order.rid,
-      orderId: order.oid,
+      orderId: order._id,
       description: "",
     });
     setOpenModal(true);
@@ -71,11 +120,18 @@ export default function Requests() {
   //     });
   // };
 
+  const reFetchOrderList = () => {
+    axios
+      .get("http://localhost:8072/order/bySiteId/" + siteID.id)
+      .then((res) => {
+        setOrders(res.data);
+      });
+  };
+
   const handleSave = () => {
     const dataToSave = {
-      requestId: modalData.requestId,
       orderId: modalData.orderId,
-      description: modalData.description, 
+      description: modalData.description,
     };
 
     // Send a POST request to save the data to the backend
@@ -92,6 +148,20 @@ export default function Requests() {
         // Handle any error that occurs while saving the data
         console.error("Error saving data:", error);
       });
+    console.log("update status");
+    axios
+      .put("http://localhost:8072/order/updateStatus", {
+        id: modalData.orderId,
+        status: "declined",
+      })
+      .then((res) => {
+        reFetchOrderList();
+        setModalData({ requestId: "", orderId: "", description: "" });
+        openModal(true);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   const handleInputChange = (e) => {
@@ -103,23 +173,41 @@ export default function Requests() {
   };
 
   // Filter orders based on search query
-  const filteredOrders = orders.filter((order) => {
-    const { site, rid, oid, tbudget, abudget, state } = order;
-    const lowerCaseQuery = searchQuery.toLowerCase();
+  // const filteredOrders = orders.filter((order) => {
+  //   const { site, rid, oid, tbudget, abudget, state } = order;
+  //   const lowerCaseQuery = searchQuery.toLowerCase();
 
-    return (
-      site.toLowerCase().includes(lowerCaseQuery) ||
-      rid.toLowerCase().includes(lowerCaseQuery) ||
-      oid.toLowerCase().includes(lowerCaseQuery) ||
-      tbudget.toString().includes(lowerCaseQuery) ||
-      abudget.toString().includes(lowerCaseQuery) ||
-      state.toLowerCase().includes(lowerCaseQuery)
-    );
-  });
+  //   return (
+  //     site.toLowerCase().includes(lowerCaseQuery) ||
+  //     rid.toLowerCase().includes(lowerCaseQuery) ||
+  //     oid.toLowerCase().includes(lowerCaseQuery) ||
+  //     tbudget.toString().includes(lowerCaseQuery) ||
+  //     abudget.toString().includes(lowerCaseQuery) ||
+  //     state.toLowerCase().includes(lowerCaseQuery)
+  //   );
+  // });
+
+  const approveOrder = (orderID) => {
+    axios
+      .put("http://localhost:8072/order/updateStatus", {
+        id: orderID,
+        status: "approved",
+      })
+      .then((res) => {
+        reFetchOrderList();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   return (
-    <>
-      <Typography variant="h4">Order List</Typography>
+    <StyledContainer>
+      <TopBarContainer>
+        <Typography variant="h4">Order List</Typography>
+        <Button variant="contained">Rejected orders</Button>
+      </TopBarContainer>
+
       <TextField
         label="Search"
         variant="outlined"
@@ -131,13 +219,13 @@ export default function Requests() {
         }}
         sx={{ marginTop: 2, marginBottom: 2 }}
       />
+
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
               <TableCell>Site Name</TableCell>
               <TableCell>Request ID</TableCell>
-              <TableCell>Order ID</TableCell>
               <TableCell>Total Budget</TableCell>
               <TableCell>Allocated Budget</TableCell>
               <TableCell>Status</TableCell>
@@ -145,24 +233,32 @@ export default function Requests() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredOrders.map((order) => (
+            {orders.map((order) => (
               <TableRow key={order._id}>
-                <TableCell>{order.site}</TableCell>
-                <TableCell>{order.rid}</TableCell>
-                <TableCell>{order.oid}</TableCell>
-                <TableCell>{order.tbudget}</TableCell>
-                <TableCell>{order.abudget}</TableCell>
-                <TableCell>{order.state}</TableCell>
+                <TableCell>{order.site.siteName}</TableCell>
+                <TableCell>S{order._id.slice(0, 4)}</TableCell>
+
+                <TableCell>{order.totalPrice}</TableCell>
+                <TableCell>{order.site.allocatedBudget}</TableCell>
                 <TableCell>
-                  <IconButton onClick={() => handleOpenModal(order)}>
-                    <SettingsIcon />
-                  </IconButton>
+                  <StatusTag color={`${order.status}`}>
+                    {order.status}
+                  </StatusTag>
+                </TableCell>
+                <TableCell>
+                  <Button onClick={() => approveOrder(order._id)}>
+                    Approve
+                  </Button>
+                  <Button onClick={() => handleOpenModal(order)}>
+                    Decline
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
+
       <Modal open={openModal} onClose={handleCloseModal}>
         <Paper
           sx={{
@@ -174,16 +270,8 @@ export default function Requests() {
           }}
         >
           <Typography variant="h6">Recommendation Details</Typography>
+
           <TextField
-            label="Request ID"
-            name="requestId"
-            fullWidth
-            value={modalData.requestId}
-            disabled
-            sx={{ marginBottom: 2 }}
-          />
-          <TextField
-            label="Order ID"
             name="orderId"
             fullWidth
             value={modalData.orderId}
@@ -197,13 +285,12 @@ export default function Requests() {
             multiline
             rows={4}
             value={modalData.description}
-            onChange={handleInputChange}
             sx={{ marginBottom: 2 }}
+            onChange={handleInputChange}
           />
           <button onClick={handleSave}>Save Data</button>
-          {openModal && <Recommends />}
         </Paper>
       </Modal>
-    </>
+    </StyledContainer>
   );
 }
