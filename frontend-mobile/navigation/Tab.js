@@ -7,7 +7,7 @@ import HomeScreen from "../screen/HomeScreen";
 import PlaceOrder from "../screen/PlaceOrder";
 import TrackOrder from "../screen/TrackOrder";
 import DraftScreen from "../screen/DraftScreen";
-import OrderPage2 from "../screen/OrderPage2";
+import OrderPage2 from "../screen/OrderPage";
 import ReviewOrder from "../screen/ReviewOrder";
 import ReviewedOrders from "../screen/ReviewedOrders";
 import UpdateOrder from "../screen/UpdateOrder";

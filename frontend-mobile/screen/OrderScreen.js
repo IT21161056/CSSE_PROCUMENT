@@ -1,36 +1,27 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react";
-import { View, Text, Alert, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
-import Icon from "react-native-vector-icons/Entypo";
-import { Ip } from "../Ip";
-import { useNavigation } from "@react-navigation/native";
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, Alert,StyleSheet } from 'react-native';
+import axios from 'axios';
+import { useNavigation } from '@react-navigation/native';
+import OrderService from '../service/OrderService';  // Singleton service
 
-
-export default function OrderScreen() {
-
-  const [orderList, setOrderList] = useState([]);//fetch the order list site manager has been placed
+const OrderScreen = () => {
+  const [orderList, setOrderList] = useState([]);
   const navigation = useNavigation();
 
-  const sendRequest = () => {
-    axios.get(`http://${Ip}:8072/order/`,).then((response) => {
-      setOrderList(response.data)//set respond data 
-    }).catch((err) => {
-      Alert.alert("Error with fetching Order List")
-      console.log(err)
-    })
-  }
-
   useEffect(() => {
-    sendRequest();
-  }, [])//send request once to backend with a empty dependency array
+    OrderService.sendRequest() // set the fetched data to the state
+      .then(response => setOrderList(response.data))
+      .catch(error => {
+        Alert.alert('Error with fetching Order List');
+        console.error(error);
+      });
+  }, []);
 
- 
   return (
     <View style={styles.container}>
       <Text style={styles.OrderScreen}>Order List</Text>
-
       <ScrollView showsVerticalScrollIndicator={false}>
-        {orderList.map((orderItem, index) => (
+      {orderList.map((orderItem, index) => (
           <View key={index} style={styles.backGround}>
             <Text style={styles.orderId}>{`O_${index + 101}`}</Text>
             <View style={styles.tableRow1}>
@@ -60,8 +51,10 @@ export default function OrderScreen() {
       </ScrollView>
     </View>
   );
+};
 
-}
+export default OrderScreen;
+
 
 const styles = StyleSheet.create({
 
