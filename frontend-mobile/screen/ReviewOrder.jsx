@@ -1,4 +1,4 @@
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import React, { useState } from "react";
 import {
   SafeAreaView,
@@ -24,6 +24,7 @@ const ReviewOrder = ({ route }) => {
   const itemData = route.params.order;
   const [visible, setVisible] = React.useState(false);
   const [review, setReview] = useState("");
+  const navigation = useNavigation();
 
   const [subOrderList, setSubOrders] = useState(itemData.productList);
 
@@ -55,7 +56,9 @@ const ReviewOrder = ({ route }) => {
 
     await axios
       .post(`http://${Ip}:8072/orderReview/add`, reviewedOrder)
-      .then((res) => {})
+      .then((res) => {
+        navigation.navigate("track");
+      })
       .catch((err) => {});
   };
 
