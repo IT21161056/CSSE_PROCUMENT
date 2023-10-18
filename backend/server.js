@@ -36,9 +36,6 @@ app.use("/orders_pdf", supplierReportRoute);
 const orderRoute = require("./routes/order.routes.js");
 app.use("/order", orderRoute);
 
-const requestRoutes = require("./routes/request.routes");
-app.use("/requestlist", requestRoutes);
-
 const recommendRoutes = require("./routes/recommend.routes");
 app.use("/recommendsmodel", recommendRoutes);
 

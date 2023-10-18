@@ -23,7 +23,7 @@ const SiteSchema = new Schema({
     ref: "SiteManager",
   },
   allocatedBudget: {
-    type: String,
+    type: Number,
   }
 });
 

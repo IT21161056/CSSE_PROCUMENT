@@ -4,9 +4,6 @@ import SupplierList from "../pages/SupplierList";
 import UpdateSupplier from "../pages/UpdateSupplier";
 import ReportList from "../pages/ReportList";
 import Requests from "../pages/Requests";
-import Recommends from "../pages/Recommends";
-import RecommendList from "../pages/RecommendList";
-import UpdateRecommends from "../pages/UpdateRecommends";
 import DashBoard from "../pages/DashBoard";
 import AddSupplier from "../pages/AddSupplier";
 import Login from "../pages/Login";
@@ -23,11 +20,8 @@ const RouteFile = () => {
       />
       <Route path="/dashboard/addSupplier" element={<AddSupplier />} />
 
-      <Route path="/reportlist" element={<ReportList />}></Route>
+      <Route path="/dashboard/reportlist" element={<ReportList />}></Route>
       <Route path="/requestlists/:id" element={<Requests />}></Route>
-      <Route path="/recommends" element={<Recommends />}></Route>
-      <Route path="/recommendlist" element={<RecommendList />}></Route>
-      <Route path="/updaterecommendst" element={<UpdateRecommends />}></Route>
     </Routes>
   );
 };
