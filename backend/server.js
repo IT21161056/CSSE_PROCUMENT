@@ -26,6 +26,10 @@ app.use("/site", siteRoutes);
 const orderReviewRoutes = require("./routes/OrderReview.routes.js");
 app.use("/orderReview", orderReviewRoutes);
 
+
+const procumentStaff = require("./routes/procument.routes.js");
+app.use("/procument", procumentStaff);
+
 // pasindu route
 const supplierRoute = require("./routes/supplier.routes.js");
 app.use("/supplier", supplierRoute);

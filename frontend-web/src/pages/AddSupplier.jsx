@@ -49,7 +49,7 @@ const AddSupplier = () => {
   }
 
   const handleSubmit = async ( event ) => {
-    // event?.preventDefault();
+    event?.preventDefault();
     setIsSubmiting(true);
     axios
       .post(`http://localhost:8072/supplier/add`, supplierDetails)
