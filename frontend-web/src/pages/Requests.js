@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
+// Import necessary components and styles from MUI
 import {
   Button,
-  IconButton,
   Modal,
   Paper,
   Table,
@@ -12,16 +12,32 @@ import {
   TableRow,
   TextField,
   Typography,
-  FormControl,
+  Card,
+  CardContent,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import SettingsIcon from "@mui/icons-material/Settings";
 import axios from "axios";
-import Recommends from "./Recommends";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
+// Define a functional component for the Popup Box
+function PopupBox({ description, onClose }) {
+  return (
+    <div className="popup">
+      <div className="popup-inner">
+        <button className="close-button" onClick={onClose}>
+          Close
+        </button>
+        <p>Description: {description}</p>
+      </div>
+    </div>
+  );
+}
+
+// Define a styled component for the main container
 const StyledContainer = styled("div")`
+  // Styles for the container
   height: 100vh;
   width: 100%;
 `;
@@ -29,10 +45,16 @@ const StyledContainer = styled("div")`
 const TopBarContainer = styled("div")`
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   width: 100%;
   height: 100px;
+`;
+
+const SubtitleContainer = styled("div")`
+  display: flex;
+  flex-direction: column;
+  margin-left: 200px;
 `;
 
 const StatusTag = styled("div")`
@@ -64,9 +86,11 @@ const StatusTag = styled("div")`
   border-style: solid;
 `;
 
+// Define the main functional component
 export default function Requests() {
   const siteID = useParams();
 
+  // State variables
   const [orders, setOrders] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [openModal, setOpenModal] = useState(false);
@@ -75,9 +99,12 @@ export default function Requests() {
     orderId: "",
     description: "",
   });
+  const [disabledLines, setDisabledLines] = useState([]);
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupDescription, setPopupDescription] = useState("");
 
+  // Use useEffect to fetch data when the component mounts
   useEffect(() => {
-    // Fetch orders data when the component mounts
     axios
       .get("http://localhost:8072/order/bySiteId/" + siteID.id)
       .then((res) => {
@@ -86,6 +113,7 @@ export default function Requests() {
       });
   }, []);
 
+  // Handlers for opening and closing the modal
   const handleOpenModal = (order) => {
     setModalData({
       orderId: order._id,
@@ -98,28 +126,7 @@ export default function Requests() {
     setOpenModal(false);
   };
 
-  // const handleSaveRecommendation = () => {
-  //   // Save the recommendation data to the database and handle the logic here
-  //   // Use axios.post to send the data to your backend API
-  //   axios
-  //     .post("http://localhost:8072/recommend/add", {
-  //       requestId: modalData.requestId,
-  //       orderId: modalData.orderId,
-  //       description: modalData.description,
-  //     })
-  //     .then((res) => {
-  //       // Recommendation saved successfully
-  //       console.log(res.data);
-  //       // Close the modal
-  //       setOpenModal(false);
-  //       // You can handle any additional logic here, e.g., displaying a success message
-  //     })
-  //     .catch((error) => {
-  //       // Handle the error, e.g., display an error message
-  //       console.error(error);
-  //     });
-  // };
-
+  // Function to refetch the order list
   const reFetchOrderList = () => {
     axios
       .get("http://localhost:8072/order/bySiteId/" + siteID.id)
@@ -128,6 +135,7 @@ export default function Requests() {
       });
   };
 
+  // Function to save data and update status
   const handleSave = () => {
     const dataToSave = {
       orderId: modalData.orderId,
@@ -138,14 +146,11 @@ export default function Requests() {
     axios
       .post("http://localhost:8072/recommendsmodel/add", dataToSave)
       .then((response) => {
-        // Data has been successfully saved
         console.log("Data saved:", response.data);
 
-        // Open the RecommendationsTable by setting openModal to true
         setOpenModal(true);
       })
       .catch((error) => {
-        // Handle any error that occurs while saving the data
         console.error("Error saving data:", error);
       });
     console.log("update status");
@@ -173,24 +178,18 @@ export default function Requests() {
   };
 
   // Filter orders based on search query
-  // const filteredOrders = orders.filter((order) => {
-  //   const { site, rid, oid, tbudget, abudget, state } = order;
-  //   const lowerCaseQuery = searchQuery.toLowerCase();
+  const filteredOrders = orders.filter((order) => {
+    const { status } = order;
+    const lowerCaseQuery = searchQuery.toLowerCase();
 
-  //   return (
-  //     site.toLowerCase().includes(lowerCaseQuery) ||
-  //     rid.toLowerCase().includes(lowerCaseQuery) ||
-  //     oid.toLowerCase().includes(lowerCaseQuery) ||
-  //     tbudget.toString().includes(lowerCaseQuery) ||
-  //     abudget.toString().includes(lowerCaseQuery) ||
-  //     state.toLowerCase().includes(lowerCaseQuery)
-  //   );
-  // });
+    return status.toLowerCase().includes(lowerCaseQuery);
+  });
 
-  const approveOrder = (orderID) => {
-    axios
+  // Function to approve an order
+  const approveOrder = async (order) => {
+    await axios
       .put("http://localhost:8072/order/updateStatus", {
-        id: orderID,
+        id: order._id,
         status: "approved",
       })
       .then((res) => {
@@ -199,57 +198,163 @@ export default function Requests() {
       .catch((err) => {
         console.log(err);
       });
+
+    await axios
+      .put("http://localhost:8072/site/updateBudget", {
+        siteid: order.site._id,
+        allocatedBudget: Number(order.totalPrice),
+      })
+      .then((res) => {
+        reFetchOrderList();
+      });
+  };
+
+  // Function to open the popup and set the description
+  const openPopup = (description) => {
+    setPopupDescription(description);
+    setShowPopup(true);
+  };
+
+  // Function to close the popup
+  const closePopup = () => {
+    setShowPopup(false);
+    setPopupDescription("");
   };
 
   return (
     <StyledContainer>
       <TopBarContainer>
-        <Typography variant="h4">Order List</Typography>
-        <Button variant="contained">Rejected orders</Button>
+        <Typography variant="h2">Order List</Typography>
       </TopBarContainer>
+
+      <SubtitleContainer>
+        <Card
+          sx={{ border: "0 solid #FF8000", width: "25%", borderRadius: "40px" }}
+        >
+          <CardContent
+            sx={{
+              border: "3px solid #FF8000",
+              width: "86%",
+              borderRadius: "40px",
+            }}
+          >
+            <Typography variant="h6">
+              Site Name: {orders.length > 0 ? orders[0].site.siteName : ""}
+            </Typography>
+          </CardContent>
+        </Card>
+      </SubtitleContainer>
 
       <TextField
         label="Search"
         variant="outlined"
+        color="warning"
+        focused
         fullWidth
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         InputProps={{
           startAdornment: <SearchIcon />,
         }}
-        sx={{ marginTop: 2, marginBottom: 2 }}
+        sx={{
+          width: "25%",
+          marginTop: 2,
+          marginBottom: 2,
+          marginLeft: 20,
+          "&:hover": {
+            "& fieldset": {
+              borderColor: "#ff4d4f", // Change to your warning color
+            },
+          },
+        }}
       />
+      <Button
+        variant="contained"
+        color="warning"
+        size="large"
+        href="/dashboard/reportlist" // Add the link to your dashboard/report list
+        startIcon={<ArrowBackIcon />} // Add a back arrow icon
+        sx={{
+          width: "25%",
+          height: "60px",
+          marginTop: 2,
+          marginBottom: 2,
+          marginLeft: 42,
+        }}
+      >
+        Back to Order Reports
+      </Button>
 
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{ width: "75%", margin: "0 auto" }}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Site Name</TableCell>
-              <TableCell>Request ID</TableCell>
-              <TableCell>Total Budget</TableCell>
-              <TableCell>Allocated Budget</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Action</TableCell>
+              <TableCell sx={{ backgroundColor: "#FF8000", color: "#fff" }}>
+                Request ID
+              </TableCell>
+              <TableCell sx={{ backgroundColor: "#FF8000", color: "#fff" }}>
+                Total Budget
+              </TableCell>
+              <TableCell sx={{ backgroundColor: "#FF8000", color: "#fff" }}>
+                Allocated Budget
+              </TableCell>
+              <TableCell sx={{ backgroundColor: "#FF8000", color: "#fff" }}>
+                Status
+              </TableCell>
+              <TableCell sx={{ backgroundColor: "#FF8000", color: "#fff" }}>
+                Action
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {orders.map((order) => (
+            {filteredOrders.map((order) => (
               <TableRow key={order._id}>
-                <TableCell>{order.site.siteName}</TableCell>
                 <TableCell>S{order._id.slice(0, 4)}</TableCell>
-
                 <TableCell>{order.totalPrice}</TableCell>
                 <TableCell>{order.site.allocatedBudget}</TableCell>
                 <TableCell>
-                  <StatusTag color={`${order.status}`}>
+                  <StatusTag
+                    color={`${order.status}`}
+                    onClick={() => {
+                      if (order.status === "declined") {
+                        openPopup(order.description);
+                      }
+                    }}
+                  >
                     {order.status}
                   </StatusTag>
                 </TableCell>
                 <TableCell>
-                  <Button onClick={() => approveOrder(order._id)}>
+                  <Button
+                    variant="outlined"
+                    color="warning"
+                    size="small"
+                    onClick={() => approveOrder(order)}
+                    sx={{
+                      color: "#FF8000",
+                      marginRight: 1,
+                      width: "40px",
+                      textTransform: "unset",
+                    }}
+                    disabled={
+                      order.status === "approved" || order.status === "declined"
+                    }
+                  >
                     Approve
                   </Button>
-                  <Button onClick={() => handleOpenModal(order)}>
+                  <Button
+                    onClick={() => handleOpenModal(order)}
+                    size="small"
+                    variant="contained"
+                    color="error"
+                    sx={{
+                      color: "#fff",
+                      textTransform: "unset",
+                    }}
+                    disabled={
+                      order.status === "approved" || order.status === "declined"
+                    }
+                  >
                     Decline
                   </Button>
                 </TableCell>

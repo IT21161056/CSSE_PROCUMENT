@@ -47,12 +47,12 @@
     ]
   },
   "devDependencies": {
+    "axios-mock-adapter": "^1.22.0",
     "babel-jest": "^29.7.0",
     "jest": "^27.5.1"
   },
   "jest": {
-  "config": "./jest.config.js"
+    "config": "./jest.config.js"
   },
   "test": "node --experimental-vm-modules node_modules/.bin/jest"
-
 }

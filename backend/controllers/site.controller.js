@@ -4,9 +4,21 @@ const Site = require("../models/Site.model");
 @method POST
 */
 const createSite = async (req, res) => {
-  const { siteName, siteAddress, siteContactNumber, siteManager, allocatedBudget } = req.body;
+  const {
+    siteName,
+    siteAddress,
+    siteContactNumber,
+    siteManager,
+    allocatedBudget,
+  } = req.body;
 
-  if (!siteName || !siteAddress || !siteContactNumber || !siteManager || !allocatedBudget) {
+  if (
+    !siteName ||
+    !siteAddress ||
+    !siteContactNumber ||
+    !siteManager ||
+    !allocatedBudget
+  ) {
     return res.send("All fields are required!");
   }
 
@@ -15,7 +27,7 @@ const createSite = async (req, res) => {
     siteAddress,
     siteContactNumber,
     siteManager,
-    allocatedBudget
+    allocatedBudget,
   });
 
   await site
@@ -52,8 +64,28 @@ const getAllSites = async (req, res) => {
   }
 };
 
+const updatAllocatedBudget = async (req, res) => {
+  try {
+    
+    const { totalPrice, siteid } = req.body;
+
+    const existingSite = await Site.findById({ _id: siteid });
+
+    if (!existingSite) return res.send("No site found!");
+
+    existingSite.allocatedBudget = existingSite - totalPrice;
+
+    existingSite.save();
+
+    res.send("Budget update successfull!");
+  } catch (error) {
+    res.send(error);
+  }
+};
+
 module.exports = {
   createSite,
   getSiteById,
   getAllSites,
+  updatAllocatedBudget,
 };

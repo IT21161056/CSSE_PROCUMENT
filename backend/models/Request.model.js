@@ -1,29 +1,29 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const RequestListSchema = new Schema({
-  site: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Site",
-  },
+const RequestSchema = new Schema({
   rid: {
     type: String,
   },
   oid: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Order",
+    type: String,
   },
-  tbudget: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Order",
-  },
+  orderList: [
+    {
+      orderRef: { type: mongoose.Schema.Types.ObjectId, ref: "Order" },
+      tbudget: { type: mongoose.Schema.Types.ObjectId, ref: "Order" },
+      status: { type: mongoose.Schema.Types.ObjectId, ref: "Order" },
+      default:[],
+    },
+  ],
   abudget: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Site",
+    ref: "Site"
   },
   state: {
     type: String,
   },
 });
 
-module.exports = mongoose.model("RequestList", RequestListSchema);
+
+module.exports = Request = mongoose.model("Request", RequestSchema);

@@ -1,60 +1,72 @@
 const { request, response } = require("express");
-const RecommendsModel = require("../models/Recommends.model");
 const config = require("config");
 
-//get Request List details by id
-const getRecommendDetailsById = async (request, response) => {
+// Singleton RecommendsModel instance
+class RecommendsModelSingleton {
+  constructor() {
+    if (!RecommendsModelSingleton.instance) {
+      this.instance = require("../models/Recommends.model");
+    }
+    return RecommendsModelSingleton.instance;
+  }
+}
+
+const RecommendsModel = new RecommendsModelSingleton();
+
+// ... Other imports and constants remain the same ...
+
+// Rest of your code remains the same with minor adjustments:
+
+// Get Request List details by ID
+const getRecommendDetailsById = async (req, res) => {
   try {
-    const user = await RecommendsModel.findById(request.params.id).select(
+    const user = await RecommendsModel.findById(req.params.id).select(
       "-requestId"
     );
-    response.json(user);
+    res.json(user);
   } catch (err) {
     console.log(err.message);
-    response.status(500).send("Server Error");
+    res.status(500).send("Server Error");
   }
 };
 
-//get RequestList List
-const getRecommend = async (request, response) => {
+// Get a list of Recommendations
+const getRecommend = async (req, res) => {
   try {
-    const recommendsmodels = await RecommendsModel.find().lean();
+    const recommendsModels = await RecommendsModel.find().lean();
 
-    if (!recommendsmodels) {
-      return response
-        .status(400)
-        .json({ message: "No recommended change found!!" });
+    if (!recommendsModels) {
+      return res.status(400).json({ message: "No recommended changes found!" });
     }
-    response.json(recommendsmodels);
+    res.json(recommendsModels);
   } catch (error) {
     console.log(error.message);
-    response.status(500).send("Server Error");
+    res.status(500).send("Server Error");
   }
 };
 
-// get single Request List
-const getSingleRecommend = async (request, response) => {
-  const id = request.params.id;
-  console.log(`single recommend id ${id}`);
+// Get a single Recommend by ID
+const getSingleRecommend = async (req, res) => {
+  const id = req.params.id;
+  console.log(`Single recommend ID: ${id}`);
 
   let singleRecommend;
 
   try {
     singleRecommend = await RecommendsModel.findOne({ _id: id });
-    response.status(200).json(singleRecommend);
+    res.status(200).json(singleRecommend);
   } catch (error) {
-    response.status(401).json(error);
+    res.status(401).json(error);
   }
 };
 
-// Add Recommend
+// Add a new Recommend
 const registerRecommend = async (req, res) => {
   const { orderId, description } = req.body;
 
   console.log(req.body);
   try {
-    //create a Recommand instance
-    user = new RecommendsModel({
+    const user = new RecommendsModel({
       orderId,
       description,
     });
@@ -63,41 +75,13 @@ const registerRecommend = async (req, res) => {
 
     res.json(user);
   } catch (err) {
-    //Something wrong with the server
     console.error(err.message);
     return res.status(500).send("Server Error");
   }
 };
 
-// const updateRecommend = async (request, response) => {
-//   const { requestId, orderId, description } = request.body;
-
-//   console.log(request.body);
-
-//   if (
-//     !requestId ||
-//     !orderId ||
-//     !description
-//   ) {
-//     return response.status(400).json({ message: "All fields are required" });
-//   }
-
-//   //confirm RequestList exist to update
-//   const recommendsmodels = await RecommendsModel.findById(_id).exec();
-
-//   if (!recommendsmodels) {
-//     return response.status(400).json({ message: "Recommend not found!!" });
-//   }
-
-//   recommendsmodels.requestId = requestId;
-//   recommendsmodels.orderId = orderId;
-//   recommendsmodels.description = description;
-
-//   const updateRecommendsModel = await recommendsmodels.save();
-//   response.json(`'${updateRecommendsModel.recommendsmodel}' updated!`);
-// };
-
-const updateRecommend = async (request, response) => {
+// Update a Recommend
+const updateRecommend = async (req, res) => {
   const { requestId, orderId, description } = req.body;
 
   if (!requestId || !orderId || !description) {
@@ -122,28 +106,26 @@ const updateRecommend = async (request, response) => {
   }
 };
 
-const deleteRecommend = async (request, response) => {
+// Delete a Recommend by ID
+const deleteRecommend = async (req, res) => {
   try {
-    const id = request.params.id;
+    const id = req.params.id;
 
     await RecommendsModel.findByIdAndDelete(id)
       .then(() => {
-        response.status(200).json({ message: "Recommend Deleted" });
+        res.status(200).json({ message: "Recommend Deleted" });
       })
       .catch((error) => {
-        //confirm data
         if (!id)
-          return response
-            .status(400)
-            .json({ message: "Recommend not found!!" });
+          return res.status(400).json({ message: "Recommend not found!" });
         else
-          response.json({
-            message: "Error with delete item ",
+          res.json({
+            message: "Error with deleting item",
             error: error.message,
           });
       });
   } catch (error) {
-    response.json({ message: error.message });
+    res.json({ message: error.message });
   }
 };
 
