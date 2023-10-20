@@ -28,7 +28,7 @@ function createSupplierDetails(supplierName = "", email = "", location = "", con
 
 const AddSupplier = () => {
   const navigate = useNavigate();
- 
+  
   const [supplierDetails, setSupplierDetails] = useState(createSupplierDetails());
   const [isSubmiting, setIsSubmiting] = useState(false);
   

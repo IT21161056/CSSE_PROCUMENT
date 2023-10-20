@@ -19,12 +19,12 @@ describe('SupplierList Component', () => {
   it('should load supplier data and display it', async () => {
     const sampleSupplierData = [
       {
-        _id: '1',
-        supplierName: 'Supplier 1',
-        email: 'supplier1@example.com',
-        location: 'Location 1',
-        contactNumber: '123-456-7890',
-        productList: [{ name: 'Product 1', price: 10, qty: 5 }],
+        _id: '6528eb3154ff334565b6d79d',
+        supplierName: 'Vikum viraj	',
+        email: 'viraj12345@gmail.com	',
+        location: 'Colombo',
+        contactNumber: '0771575982',
+        productList: [{ name: 'Sand', price: 2000, qty: 60 }],
         orderList: [],
       },
     ];
@@ -36,21 +36,21 @@ describe('SupplierList Component', () => {
 
     // Wait for data to load
     await waitFor(() => expect(screen.getByText('Supplier Name')).toBeInTheDocument());
-    expect(screen.getByText('Supplier 1')).toBeInTheDocument();
-    expect(screen.getByText('supplier1@example.com')).toBeInTheDocument();
+    expect(screen.getByText('Vikum viraj')).toBeInTheDocument();
+    expect(screen.getByText('viraj12345@gmail.com')).toBeInTheDocument();
   });
 
   it('should filter suppliers based on search query', async () => {
     const sampleSupplierData = [
       {
-        _id: '1',
-        supplierName: 'Supplier 1',
-        email: 'supplier1@example.com',
+        _id: '6528eb3154ff334565b6d79d',
+        supplierName: 'Vikum viraj',
+        email: 'viraj@12345@gmail.com',
       },
       {
-        _id: '2',
-        supplierName: 'Supplier 2',
-        email: 'supplier2@example.com',
+        _id: '6528eb8654ff334565b6d7a5',
+        supplierName: 'pasindu perakum',
+        email: 'pasindu@gmail.com',
       },
     ];
 
